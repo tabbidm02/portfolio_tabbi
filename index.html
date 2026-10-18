@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agustin Tabbita — Multimedial Designer | Portfolio</title>
+  <meta name="description" content="Portfolio de Agustin Tabbita, Multimedial Designer. Exploración de diseño, interacción y experiencias digitales.">
+
+  <!-- Favicon con el isotipo bb -->
+  <link rel="icon" type="image/svg+xml" href="assets/svg/logo.svg">
+
+  <!-- Google Fonts: Montserrat variable (200 a 400) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200..400&display=swap" rel="stylesheet">
+
+  <!-- Estilos principales -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-frame="1">
+  <!-- Filtro SVG nativo para efecto de tinta viva / stop-motion en lettering a mano -->
+  <svg class="visually-hidden" aria-hidden="true">
+    <defs>
+      <filter id="inkWiggle">
+        <feTurbulence id="inkTurbulence" type="fractalNoise" baseFrequency="0.035" numOctaves="2" result="noise" seed="1" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Canvas de fondo para la grilla técnica -->
+  <canvas id="techGridCanvas" class="tech-grid" aria-hidden="true"></canvas>
+
+  <!-- Contenedor General de la Aplicación -->
+  <div class="portfolio-app" id="portfolioApp">
+
+    <!-- Header / Título Principal Caligráfico (Compartido y en transición fluida entre Frame 1 y Frame 2) -->
+    <header class="hero-title-wrapper" id="heroTitleWrapper" title="Agustin Tabbita Portfolio">
+      <h1 class="visually-hidden">Portfolio</h1>
+      <button class="title-action-btn" id="titleHomeBtn" aria-label="Ir al inicio" tabindex="0">
+        <img 
+          src="assets/svg/portfolio.svg" 
+          alt="PORTFOLIO" 
+          class="hero-svg hero-title"
+          draggable="false"
+        >
+      </button>
+    </header>
+
+    <!-- FRAME 1: Subtítulo y Autor (Se desvanecen al pasar al Frame 2) -->
+    <div class="frame1-elements" id="frame1Elements">
+      <!-- Subtítulo caligráfico -->
+      <div class="hero-item hero-subtitle-wrapper">
+        <h2 class="visually-hidden">Multimedial Designer</h2>
+        <img 
+          src="assets/svg/subtitulo.svg" 
+          alt="Multimedial Designer" 
+          class="hero-svg hero-subtitle"
+          draggable="false"
+        >
+      </div>
+
+      <!-- Autor (Texto HTML real con Montserrat 200) -->
+      <div class="hero-item hero-author-wrapper">
+        <p class="hero-author">
+          by Agustin Tabbita
+        </p>
+      </div>
+    </div>
+
+    <!-- FRAME 2: Menú Lateral de Categorías (left: 2.19%, top: 15%) -->
+    <nav class="categories-nav" id="categoriesNav" aria-label="Categorías del portfolio">
+      <ul class="categories-list" id="categoriesList" role="tablist">
+        <!-- 1. Sobre mi (Activa por defecto) -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item is-active" 
+            role="tab" 
+            aria-selected="true" 
+            aria-controls="panel-sobre-mi" 
+            id="tab-sobre-mi" 
+            data-category="sobre-mi"
+          >
+            <span class="category-label">Sobre mi</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 2. Flyers -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item" 
+            role="tab" 
+            aria-selected="false" 
+            aria-controls="panel-flyers" 
+            id="tab-flyers" 
+            data-category="flyers"
+          >
+            <span class="category-label">Flyers</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 3. Multimediales -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item" 
+            role="tab" 
+            aria-selected="false" 
+            aria-controls="panel-multimediales" 
+            id="tab-multimediales" 
+            data-category="multimediales"
+          >
+            <span class="category-label">Multimediales</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 4. Vibecode -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item" 
+            role="tab" 
+            aria-selected="false" 
+            aria-controls="panel-vibecode" 
+            id="tab-vibecode" 
+            data-category="vibecode"
+          >
+            <span class="category-label">Vibecode</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 5. Logofolio -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item" 
+            role="tab" 
+            aria-selected="false" 
+            aria-controls="panel-logofolio" 
+            id="tab-logofolio" 
+            data-category="logofolio"
+          >
+            <span class="category-label">Logofolio</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 6. Etc -->
+        <li class="category-wrapper" role="presentation">
+          <button 
+            class="category-item" 
+            role="tab" 
+            aria-selected="false" 
+            aria-controls="panel-etc" 
+            id="tab-etc" 
+            data-category="etc"
+          >
+            <span class="category-label">Etc</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+      </ul>
+
+      <!-- Barra indicadora activa deslizante (height: 2.5px, width: 52px) -->
+      <div class="category-active-line" id="categoryActiveLine" aria-hidden="true"></div>
+    </nav>
+
+    <!-- FRAME 2: Contenedor Principal Dinámico (left: 25% hasta right: 5%) -->
+    <main class="category-display" id="categoryDisplay" aria-live="polite">
+      <!-- 1. Sobre mi (Activa por defecto) -->
+      <section 
+        class="category-panel is-active" 
+        id="panel-sobre-mi" 
+        role="tabpanel" 
+        aria-labelledby="tab-sobre-mi"
+      >
+        <div class="category-panel-placeholder" data-panel="sobre-mi"></div>
+      </section>
+
+      <!-- 2. Flyers -->
+      <section 
+        class="category-panel" 
+        id="panel-flyers" 
+        role="tabpanel" 
+        aria-labelledby="tab-flyers"
+      >
+        <div class="category-panel-placeholder" data-panel="flyers"></div>
+      </section>
+
+      <!-- 3. Multimediales -->
+      <section 
+        class="category-panel" 
+        id="panel-multimediales" 
+        role="tabpanel" 
+        aria-labelledby="tab-multimediales"
+      >
+        <div class="category-panel-placeholder" data-panel="multimediales"></div>
+      </section>
+
+      <!-- 4. Vibecode -->
+      <section 
+        class="category-panel" 
+        id="panel-vibecode" 
+        role="tabpanel" 
+        aria-labelledby="tab-vibecode"
+      >
+        <div class="category-panel-placeholder" data-panel="vibecode"></div>
+      </section>
+
+      <!-- 5. Logofolio -->
+      <section 
+        class="category-panel" 
+        id="panel-logofolio" 
+        role="tabpanel" 
+        aria-labelledby="tab-logofolio"
+      >
+        <div class="category-panel-placeholder" data-panel="logofolio"></div>
+      </section>
+
+      <!-- 6. Etc -->
+      <section 
+        class="category-panel" 
+        id="panel-etc" 
+        role="tabpanel" 
+        aria-labelledby="tab-etc"
+      >
+        <div class="category-panel-placeholder" data-panel="etc"></div>
+      </section>
+    </main>
+
+    <!-- Isotipo esquina inferior derecha (Compartido en Frame 1 y Frame 2) -->
+    <aside class="hero-logo-wrapper" id="heroLogoWrapper">
+      <div class="hero-logo-link" aria-label="Isotipo Agustin Tabbita">
+        <img 
+          src="assets/svg/logo.svg" 
+          alt="Isotipo bb" 
+          class="hero-logo"
+          draggable="false"
+        >
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Script modular -->
+  <script src="js/main.js"></script>
+</body>
+</html>

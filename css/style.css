@@ -1,0 +1,616 @@
+/* ==========================================================================
+   AGUSTIN TABBITA — PORTFOLIO
+   FRAME 1 (Hero Section) & FRAME 2 (Barra Lateral y Contenedor Principal)
+   Base de referencia Figma: 1920x1080
+   ========================================================================== */
+
+/* --- Variables Globales --- */
+:root {
+  --bg-color: #212121;
+  --text-primary: #FFFFFF;
+
+  /* Curvas de aceleración y elasticidad */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Proporciones Desktop Frame 1 */
+  --margin-left-axis-f1: 4.58vw; /* ~88px en FHD */
+  --top-title-f1: 19vh;
+  --top-subtitle-f1: 40.4vh;
+  --top-author-f1: 57.2vh;
+
+  --width-title-f1: 44.5vw;
+  --max-width-title-f1: 855px;
+  --width-subtitle: 26vw;
+  --max-width-subtitle: 500px;
+
+  /* Proporciones Desktop Frame 2 (left: 2.19% ~42px, top: 3.43% ~37px) */
+  --margin-left-axis-f2: 2.19vw; /* ~42px en FHD */
+  --top-title-f2: 3.43vh;        /* ~37px en FHD */
+  --width-title-f2: 20.91vw;     /* ~401px en FHD */
+  --max-width-title-f2: 401px;
+
+  --top-categories-f2: 15vh;     /* ~162px en FHD */
+
+  /* Isotipo Esquina Inferior Derecha (Común a ambos frames) */
+  --pos-logo-right: 4.57vw;
+  --pos-logo-bottom: 4.5vh;
+  --width-logo: 3.5vw;
+  --max-width-logo: 67px;
+  --min-width-logo: 44px;
+
+  /* Tipografía */
+  --font-size-author: clamp(1.2rem, 2.08vw, 40px);
+  --font-size-cat-active: clamp(1.5rem, 1.875vw, 36px);
+  --font-size-cat-inactive: clamp(1.1rem, 1.25vw, 24px);
+  --line-active-width: 52px;     /* 2.71vw en Figma */
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Clases de accesibilidad */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   CANVAS DE GRILLA TÉCNICA (Sutil, difuminada y continua)
+   ========================================================================== */
+.tech-grid {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  filter: blur(0.25px);
+  transition: opacity 1.5s var(--ease-out-expo);
+}
+
+body.loaded .tech-grid {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL DE LA APP
+   ========================================================================== */
+.portfolio-app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   HEADER / TÍTULO PRINCIPAL (portfolio.svg)
+   Transición fluida de Frame 1 (centro) a Frame 2 (esquina superior izquierda)
+   ========================================================================== */
+.hero-title-wrapper {
+  position: absolute;
+  top: var(--top-title-f1);
+  left: var(--margin-left-axis-f1);
+  width: var(--width-title-f1);
+  max-width: var(--max-width-title-f1);
+  z-index: 30;
+  overflow: hidden;
+  padding-bottom: 6px;
+  margin-bottom: -6px;
+  /* Transición fluida entre Frame 1 y Frame 2 */
+  transition: 
+    top 0.85s var(--ease-out-expo),
+    left 0.85s var(--ease-out-expo),
+    width 0.85s var(--ease-out-expo),
+    max-width 0.85s var(--ease-out-expo);
+}
+
+.title-action-btn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: default;
+  outline: none;
+  text-align: left;
+}
+
+/* Animación de entrada inicial del título (Architectural Mask) */
+.hero-title-wrapper .hero-svg {
+  transform: translateY(115%);
+  opacity: 0;
+  transition: 
+    transform 1.1s var(--ease-out-expo) 0.12s,
+    opacity 0.4s ease 0.12s;
+}
+
+body.loaded .hero-title-wrapper .hero-svg {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+/* Efecto continuo de tinta viva en stop-motion */
+.hero-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: url(#inkWiggle);
+  will-change: transform, filter;
+}
+
+/* ESTADO EN FRAME 2: Título anclado a la esquina superior izquierda */
+body[data-frame="2"] .hero-title-wrapper {
+  top: var(--top-title-f2);
+  left: var(--margin-left-axis-f2);
+  width: var(--width-title-f2);
+  max-width: var(--max-width-title-f2);
+}
+
+body[data-frame="2"] .title-action-btn {
+  cursor: pointer;
+}
+
+body[data-frame="2"] .title-action-btn:hover .hero-title {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   FRAME 1: ELEMENTOS HERO (Subtítulo, Autor, Hint)
+   ========================================================================== */
+.frame1-elements {
+  position: absolute;
+  inset: 0;
+  left: var(--margin-left-axis-f1);
+  right: var(--margin-left-axis-f1);
+  pointer-events: none;
+  opacity: 1;
+  transform: translateY(0);
+  transition: 
+    opacity 0.5s ease,
+    transform 0.6s var(--ease-out-expo);
+}
+
+/* Ocultar elementos del Frame 1 al pasar al Frame 2 */
+body[data-frame="2"] .frame1-elements {
+  opacity: 0;
+  transform: translateY(-24px);
+  pointer-events: none;
+}
+
+.hero-item {
+  position: absolute;
+  pointer-events: auto;
+  overflow: hidden;
+  padding-bottom: 6px;
+  margin-bottom: -6px;
+}
+
+/* Subtítulo: Multimedial Designer */
+.hero-subtitle-wrapper {
+  top: var(--top-subtitle-f1);
+  width: var(--width-subtitle);
+  max-width: var(--max-width-subtitle);
+}
+
+.hero-subtitle-wrapper .hero-svg {
+  transform: translateY(115%);
+  opacity: 0;
+  transition: 
+    transform 1.05s var(--ease-out-expo) 0.32s,
+    opacity 0.4s ease 0.32s;
+}
+
+body.loaded .hero-subtitle-wrapper .hero-svg {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+/* Autor: by Agustin Tabbita */
+.hero-author-wrapper {
+  top: var(--top-author-f1);
+}
+
+.hero-author {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 200;
+  font-size: var(--font-size-author);
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  opacity: 0;
+  cursor: default;
+  display: inline-block;
+  transform: translateY(120%);
+  transition: 
+    transform 0.95s var(--ease-out-expo) 0.52s,
+    opacity 0.4s ease 0.52s;
+  will-change: transform, opacity;
+}
+
+body.loaded .hero-author {
+  transform: translateY(0%);
+  opacity: 0.88;
+}
+
+/* ==========================================================================
+   FRAME 2: MENÚ LATERAL DE CATEGORÍAS (left: 2.19%, top: 15%)
+   ========================================================================== */
+.categories-nav {
+  position: absolute;
+  left: var(--margin-left-axis-f2);
+  top: var(--top-categories-f2);
+  z-index: 25;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+body[data-frame="2"] .categories-nav {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.4s ease 0.45s;
+}
+
+.categories-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vh, 22px);
+  position: relative;
+}
+
+/* Cada fila es una máscara de corte arquitectónico (guillotina) */
+.category-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden; /* Máscara de corte horizontal de guillotina para la entrada */
+  padding: 4px 30px 6px 0;
+  margin: -4px 0 -6px 0;
+}
+
+/* Una vez completada la entrada en Frame 2, el contenedor libera el overflow para que el hover y la escala no se recorten */
+.categories-nav.is-ready .category-wrapper {
+  overflow: visible;
+}
+
+/* Botón individual de categoría: en Frame 1 oculto debajo de su línea de corte */
+.category-item {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transform: translateY(125%);
+  opacity: 0;
+  transition: 
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+/* Al entrar al Frame 2: cada categoría brota de su guillotina de forma escalonada una vez que el título termina su viaje */
+body[data-frame="2"] .category-item {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+body[data-frame="2"] .category-wrapper:nth-child(1) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.55s, opacity 0.5s ease 0.55s;
+}
+body[data-frame="2"] .category-wrapper:nth-child(2) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.63s, opacity 0.5s ease 0.63s;
+}
+body[data-frame="2"] .category-wrapper:nth-child(3) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.71s, opacity 0.5s ease 0.71s;
+}
+body[data-frame="2"] .category-wrapper:nth-child(4) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.79s, opacity 0.5s ease 0.79s;
+}
+body[data-frame="2"] .category-wrapper:nth-child(5) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.87s, opacity 0.5s ease 0.87s;
+}
+body[data-frame="2"] .category-wrapper:nth-child(6) .category-item {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.95s, opacity 0.5s ease 0.95s;
+}
+
+/* --- TIPOGRAFÍA Y ESCALADO ULTRA SUAVE (Sin saltos de glifos ni layout shifts) --- */
+.category-label {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.15rem, 1.25vw, 24px);
+  line-height: 1.25;
+  transform-origin: left 70%;
+  transition: 
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease,
+    font-variation-settings 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    font-weight 0.4s ease;
+  will-change: transform, opacity;
+}
+
+/* Categorías inactivas: ExtraLight 200, opacity 0.45 */
+.category-item:not(.is-active) .category-label {
+  font-weight: 200;
+  font-variation-settings: 'wght' 200;
+  opacity: 0.45;
+  transform: scale(1) translateX(0);
+}
+
+/* Hover suave en categorías inactivas: opacity 0.85 y desplazamiento sutil */
+@media (hover: hover) and (pointer: fine) {
+  .category-item:not(.is-active):hover .category-label {
+    opacity: 0.85;
+    transform: scale(1) translateX(6px);
+  }
+
+  /* Previsualización tenue de la barrita inferior creciendo a 25px con puntas redondeadas */
+  .category-item:not(.is-active):hover .category-hover-line {
+    width: 25px;
+    opacity: 0.55;
+  }
+}
+
+.category-hover-line {
+  display: block;
+  width: 0px;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: 999px; /* Puntas redondeadas */
+  opacity: 0;
+  margin-top: 4px;
+  transition: 
+    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.35s ease;
+}
+
+/* Categoría activa: escala fluida con GPU a ~36px y Regular 400 */
+.category-item.is-active .category-label {
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
+  opacity: 1;
+  transform: scale(1.42) translateX(0);
+  cursor: default;
+}
+
+/* Barra indicadora activa deslizante de 52px con puntas redondeadas y transición fluida */
+.category-active-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--line-active-width);
+  height: 2.5px;
+  background-color: var(--text-primary);
+  border-radius: 999px; /* Puntas redondeadas suaves (cápsula / pill) */
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(0);
+  /* Curva cubic-bezier(0.16, 1, 0.3, 1) sincronizada con el escalado */
+  transition: 
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease;
+  will-change: transform;
+}
+
+body[data-frame="2"] .category-active-line {
+  opacity: 1;
+  transition: 
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.6s ease 0.85s;
+}
+
+/* ==========================================================================
+   FRAME 2: CONTENEDOR PRINCIPAL DINÁMICO (left: 25% hasta right: 5%)
+   ========================================================================== */
+.category-display {
+  position: absolute;
+  left: 25vw;
+  right: 5vw;
+  top: 15vh;
+  bottom: 5vh;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: 
+    opacity 0.4s ease,
+    transform 0.5s var(--ease-out-expo);
+}
+
+body[data-frame="2"] .category-display {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: 
+    opacity 0.7s ease 0.32s,
+    transform 0.8s var(--ease-out-expo) 0.32s;
+}
+
+.category-panel {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  transition: 
+    opacity 0.45s ease,
+    transform 0.5s var(--ease-out-expo);
+  display: block;
+}
+
+.category-panel.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   ISOTIPO (logo.svg) EN ESQUINA INFERIOR DERECHA
+   ========================================================================== */
+.hero-logo-wrapper {
+  position: absolute;
+  right: var(--pos-logo-right);
+  bottom: var(--pos-logo-bottom);
+  width: var(--width-logo);
+  max-width: var(--max-width-logo);
+  min-width: var(--min-width-logo);
+  z-index: 30;
+  overflow: hidden;
+  padding-bottom: 4px;
+}
+
+.hero-logo-link {
+  display: block;
+  width: 100%;
+  cursor: default;
+  outline: none;
+  text-decoration: none;
+}
+
+.hero-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: 
+    transform 0.9s var(--ease-out-expo) 0.70s,
+    opacity 0.4s ease 0.70s;
+  will-change: transform, opacity;
+}
+
+body.loaded .hero-logo {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD: TABLETS (<= 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  :root {
+    --margin-left-axis-f1: 6vw;
+    --width-title-f1: 56vw;
+    --width-subtitle: 34vw;
+    --font-size-author: clamp(1.1rem, 2.8vw, 32px);
+
+    --margin-left-axis-f2: 4vw;
+    --width-title-f2: 28vw;
+    --top-categories-f2: 13vh;
+    --font-size-cat-active: 30px;
+    --font-size-cat-inactive: 20px;
+  }
+
+  .category-display {
+    left: 35vw;
+    right: 4vw;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD: MOBILE (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  :root {
+    --margin-left-axis-f1: 8.8vw;
+    --top-title-f1: 19.3vh;
+    --top-subtitle-f1: 30.2vh;
+    --top-author-f1: 40.1vh;
+    --width-title-f1: 84vw;
+    --max-width-title-f1: 380px;
+    --width-subtitle: 49.2vw;
+    --max-width-subtitle: 230px;
+    --font-size-author: clamp(0.95rem, 4.2vw, 17px);
+
+    --pos-logo-right: 8.8vw;
+    --pos-logo-bottom: 6.4vh;
+    --width-logo: 9.5vw;
+    --max-width-logo: 42px;
+    --min-width-logo: 32px;
+
+    /* Frame 2 Mobile */
+    --margin-left-axis-f2: 6vw;
+    --top-title-f2: 2.5vh;
+    --width-title-f2: 42vw;
+    --max-width-title-f2: 190px;
+    --top-categories-f2: 10vh;
+    --font-size-cat-active: clamp(1.2rem, 5vw, 26px);
+    --font-size-cat-inactive: clamp(0.95rem, 3.8vw, 18px);
+    --line-active-width: 40px;
+  }
+
+  .category-display {
+    left: 6vw;
+    right: 6vw;
+    top: 48vh;
+    bottom: 8vh;
+  }
+
+  .categories-list {
+    gap: 10px;
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD: REDUCCIÓN DE MOVIMIENTO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-svg,
+  .hero-author,
+  .hero-logo,
+  .categories-nav,
+  .category-display {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
