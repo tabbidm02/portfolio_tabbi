@@ -8,6 +8,155 @@
 (function () {
   'use strict';
 
+  /* ==========================================================================
+   * === ZONA EDITABLE DE FLYERS =============================================
+   * ==========================================================================
+   * Modifica aquí la ruta de la carpeta, el texto introductorio y la lista
+   * de flyers para agregarlos o editarlos fácilmente.
+   * ========================================================================== */
+
+  const CARPETA_FLYERS = './flyers/';
+
+  // Texto introductorio inicial de la categoría (sin título, solo el párrafo):
+  const TEXTO_INTRO_FLYERS = "Piezas gráficas para eventos, recitales y activaciones culturales. Tipografía experimental, composición de alto impacto visual y tratamiento de imagen contemporáneo.";
+
+  // Velocidad de la cinta de empaque en píxeles por segundo (Ajustable a gusto):
+  const VELOCIDAD_CINTA_FLYERS = 68;
+
+  // Lista de flyers y series:
+  // NOTA: Únicamente Star Wars y PS1 están agrupados en series rotatorias.
+  // Todos los demás flyers se presentan individualmente y su orden se baraja
+  // aleatoriamente cada vez que se ingresa a la categoría "Flyers".
+  const LISTA_FLYERS = [
+    {
+      archivos: ["DTmF post vertical@72x-100.jpg"],
+      titulo: "DTmF — Vito Carbonella & Ramón Zapico",
+      descripcion: "Afiche tipográfico y síntesis de alto contraste bicromático para fecha en vivo. Exploración de contornos dinámicos y jerarquía tipográfica brutalista."
+    },
+    {
+      archivos: ["Mesa de trabajo 2@72x-100.jpg"],
+      titulo: "MDQ — Mar Del Plata",
+      descripcion: "Composición fotográfica de playa popular intervenida con tipografía condensada de gran escala. Cruce entre gráfica turística retro y estética urbana actual."
+    },
+    {
+      archivos: ["Cadaver exquisito_Mesa de trabajo 1.png"],
+      titulo: "Cadáver Exquisito — Vuelo",
+      descripcion: "Gráfica experimental basada en la técnica surrealista de ensamble. Fusión de figura escultórica y tipografía serif distorsionada en rojo profundo."
+    },
+    {
+      archivos: ["flayer 3 cato&paco.png"],
+      titulo: "Cato & Paco — Vol. 1",
+      descripcion: "Afiche promocional para fecha en vivo de Cato & Paco. Tratamiento de medios tonos, saturación ácida y tipografía rítmica."
+    },
+    {
+      archivos: ["flayer 4 cato&paco.png"],
+      titulo: "Cato & Paco — Vol. 2",
+      descripcion: "Segunda entrega de la serie para Cato & Paco. Composición espejada, paleta de alto impacto cromático y balance tipográfico experimental."
+    },
+    {
+      archivos: ["Tunic Flayer_1.jpg"],
+      titulo: "Tunic — Edición I",
+      descripcion: "Interpretación visual inspirada en el videojuego indie. Ilustración vectorial de atmósfera mística y paleta tonal evocativa."
+    },
+    {
+      archivos: ["Tunic Flayer_2.jpg"],
+      titulo: "Tunic — Edición II",
+      descripcion: "Segunda variación gráfica sobre el universo de Tunic. Tratamiento atmosférico y simbología vectorial críptica."
+    },
+    {
+      archivos: ["MISTERNA,CO-OFFLINE.png"],
+      titulo: "Misterna — Co-Offline",
+      descripcion: "Pieza promocional de corte minimalista y underground. Tensión visual a través de espacios negativos y modulación tipográfica."
+    },
+    {
+      archivos: ["PORSCHE_Mesa de trabajo 1.jpg"],
+      titulo: "Porsche 911 — Serie Roja",
+      descripcion: "Homenaje a la silueta clásica del 911. Gráfica en bloque con rojo bermellón sólido, textura de grabado halftone y presencia vehicular imponente."
+    },
+    // --- SERIE AGRUPADA 1: PlayStation 30th Anniversary (Rotación de variaciones) ---
+    {
+      archivos: ["PS130th black.jpg", "PS130TH grey.jpg", "PS130TH withe.jpg"],
+      intervalo: 1600,
+      titulo: "PlayStation 30th Anniversary — Recolors",
+      descripcion: "Serie de tres variaciones tonales (Dark, Silver y Classic White) conmemorando los 30 años de la consola. Síntesis geométrica de la silueta icónica."
+    },
+    {
+      archivos: ["Horizon Flayer IG_1.jpg"],
+      titulo: "Horizon Zero Dawn — Bestiary I",
+      descripcion: "Afiche técnico estilizado tipo pergamino con tipografía tribal-futurista e ilustración monocromática de las máquinas del universo Horizon."
+    },
+    {
+      archivos: ["Horizon Flayer IG_2.jpg"],
+      titulo: "Horizon Zero Dawn — Bestiary II",
+      descripcion: "Segunda lámina del bestiario Horizon. Documentación visual y esquemática de fauna robótica con estética de manual de campo."
+    },
+    // --- SERIE AGRUPADA 2: Star Wars (Colección rotatoria de carátulas) ---
+    {
+      archivos: [
+        "ig horizontal@72x-100.jpg",
+        "ig horizontal copia@72x-100.jpg",
+        "ig horizontal copia 2@72x-100.jpg",
+        "ig horizontal copia 3@72x-100.jpg",
+        "ig horizontal copia 4@72x-100.jpg",
+        "ig horizontal copia 5@72x-100.jpg"
+      ],
+      intervalo: 1800,
+      titulo: "Star Wars — Serie de Carátulas",
+      descripcion: "Colección de 6 carátulas panorámicas para redes sociales recorriendo los episodios de la saga. Composición cinematográfica y gradaciones tonales temáticas."
+    },
+    {
+      archivos: ["MAUL1.png"],
+      titulo: "Darth Maul — Sith Edition I",
+      descripcion: "Estudio de personaje en alto contraste con el sable doble y grafismo rítmico. Contraste violento entre negro puro y carmesí Sith."
+    },
+    {
+      archivos: ["MAUL2.png"],
+      titulo: "Darth Maul — Sith Edition II",
+      descripcion: "Segunda variación gráfica de Darth Maul con énfasis en la tipografía gestual y textura de alto impacto."
+    },
+    {
+      archivos: ["neuropibada.jpg"],
+      titulo: "Neuropibada — Gráfica Experimental",
+      descripcion: "Exploración de textura digital degradada, glitch y colisiones visuales de baja fidelidad para convocatoria cultural alternativa."
+    },
+    {
+      archivos: ["Mesa de trabajo 1.png"],
+      titulo: "Mesa de Trabajo — Edición I",
+      descripcion: "Composición de afiche experimental con estructuración asimétrica y tipografía condensada contemporánea."
+    },
+    {
+      archivos: ["Mesa de trabajo1.png"],
+      titulo: "Mesa de Trabajo — Edición II",
+      descripcion: "Exploración visual complementaria con balance de pesos tipográficos y texturas monocromáticas."
+    },
+    {
+      archivos: ["arg (pdf.io).jpg"],
+      titulo: "AFA — Selección Argentina",
+      descripcion: "Homenaje tipográfico y afiche conmemorativo de alto impacto para la Selección Argentina. Fotografía documental intervenida con texturas analógicas y tipografía condensada."
+    },
+    {
+      archivos: ["badbunny concierto.jpg"],
+      titulo: "Bad Bunny — En Concierto",
+      descripcion: "Afiche promocional de recital masivo. Composición contemporánea con contrastes cromáticos saturados, síntesis tipográfica y estética urbana underground."
+    },
+    {
+      archivos: ["Mesa de trabajo 1.jpg"],
+      titulo: "Exploración Visual — Serie Gráfica I",
+      descripcion: "Composición experimental en gran escala. Exploración de diagramación asimétrica, jerarquías dinámicas y texturas visuales contemporáneas."
+    },
+    {
+      archivos: ["Mesa de trabajo 1 copia 2.jpg"],
+      titulo: "Exploración Visual — Serie Gráfica II",
+      descripcion: "Variación compositiva con modulación tipográfica experimental, contraste tonal acentuado y balance de pesos visuales."
+    },
+    {
+      archivos: ["Mesa de trabajo 1 copia 3.jpg"],
+      titulo: "Exploración Visual — Serie Gráfica III",
+      descripcion: "Lámina gráfica de estudio formal con interacción de figuras geométricas, paleta monocromática y contrapuntos visuales dinámicos."
+    }
+  ];
+  /* ========================================================================== */
+
   /* --------------------------------------------------------------------------
    * 1. CONTROLADOR DE CARGA INICIAL
    * -------------------------------------------------------------------------- */
@@ -103,9 +252,9 @@
         const x = i * baseStep;
         const isMajor = (i % majorStepCount === 0);
 
-        const alpha = isMajor ? 0.038 : 0.016;
+        const alpha = isMajor ? 0.022 : 0.009;
         ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.lineWidth = isMajor ? 1 : 0.8;
+        ctx.lineWidth = isMajor ? 0.8 : 0.6;
 
         ctx.beginPath();
         ctx.moveTo(x + 0.5, 0);
@@ -119,9 +268,9 @@
         const y = j * baseStep;
         const isMajor = (j % majorStepCount === 0);
 
-        const alpha = isMajor ? 0.038 : 0.016;
+        const alpha = isMajor ? 0.022 : 0.009;
         ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.lineWidth = isMajor ? 1 : 0.8;
+        ctx.lineWidth = isMajor ? 0.8 : 0.6;
 
         ctx.beginPath();
         ctx.moveTo(0, y + 0.5);
@@ -138,13 +287,13 @@
           const crossX = i * majorStep;
           const crossY = j * majorStep;
 
-          this.drawCross(crossX, crossY, 14, 0.055);
+          this.drawCross(crossX, crossY, 14, 0.032);
 
           const dotX = crossX + majorStep / 2;
           const dotY = crossY + majorStep / 2;
 
           if (dotX < width && dotY < height) {
-            this.drawDot(dotX, dotY, 2, 0.035);
+            this.drawDot(dotX, dotY, 2, 0.018);
           }
         }
       }
@@ -239,16 +388,25 @@
           setTimeout(() => {
             this.categoriesController.updateActiveLine(true);
           }, 700);
+
+          // Al entrar al Frame 2, abrir el panel lateral de descripción para la categoría activa
+          setTimeout(() => {
+            if (this.currentFrame === 2) {
+              this.categoriesController.triggerPanelSequence(this.categoriesController.activeCategory, false);
+            }
+          }, 600);
         }
       } else {
         if (categoriesNav) {
           categoriesNav.classList.remove('is-ready');
         }
-        // Al regresar a Frame 1, reiniciar categoría activa a Sobre mi (índice 0)
+        // Al regresar a Frame 1, cerrar el panel derecho y restablecer el logo blanco
         if (this.categoriesController) {
+          this.categoriesController.closeDescPanel();
+
           const firstBtn = this.categoriesController.items[0];
           if (firstBtn) {
-            this.categoriesController.selectCategory(firstBtn.dataset.category, firstBtn);
+            this.categoriesController.selectCategory(firstBtn.dataset.category, firstBtn, true);
           }
         }
       }
@@ -258,6 +416,12 @@
       // 1. Navegación por rueda del ratón / trackpad (wheel)
       window.addEventListener('wheel', (e) => {
         if (this.isThrottled) return;
+
+        // Si el usuario está scrolleando dentro del feed de flyers, permitir navegación libre en la cinta infinita
+        const flyersFeed = document.getElementById('flyersScrollContainer');
+        if (this.currentFrame === 2 && this.categoriesController?.activeCategory === 'flyers' && flyersFeed && (flyersFeed.contains(e.target) || e.target.closest('#panel-flyers'))) {
+          return; // Permitir que la cinta de flyers scrollee libremente sin interferir con el cambio de categorías
+        }
 
         // Scroll hacia abajo: avanzar de Frame 1 a Frame 2, o navegar a la siguiente categoría
         if (e.deltaY > 25) {
@@ -392,8 +556,46 @@
   }
 
   /* --------------------------------------------------------------------------
-   * 5. CONTROLADOR DEL MENÚ DE CATEGORÍAS (Feedback interactivo y línea indicadora)
+   * 5. DATOS Y CONTROLADOR DEL MENÚ DE CATEGORÍAS & PANEL DE DESCRIPCIÓN
    * -------------------------------------------------------------------------- */
+  const CATEGORY_DATA = {
+    'sobre-mi': {
+      title: 'Sobre mi',
+      desc: 'Diseñador multimedial enfocado en la convergencia entre diseño visual, código creativo e interacción. Exploración constante de nuevas estéticas y experiencias digitales.'
+    },
+    'flyers': {
+      title: '', // Sin título en el estado introductorio
+      desc: TEXTO_INTRO_FLYERS
+    },
+    'multimediales': {
+      title: 'Multimediales',
+      desc: 'Instalaciones interactivas, motion graphics y proyectos audiovisuales que exploran el espacio, el tiempo y la relación activa con el espectador.'
+    },
+    'vibecode': {
+      title: 'Vibecode',
+      desc: 'Sistemas generativos, algoritmos visuales, shaders y experimentos de código donde la matemática se convierte en expresión estética y movimiento vivo.'
+    },
+    'logofolio': {
+      title: 'Logofolio',
+      desc: 'Desarrollo de marcas, síntesis formal e identidades visuales pensadas para perdurar y adaptarse dinámicamente a entornos físicos y digitales.'
+    },
+    'etc': {
+      title: 'Etc',
+      desc: 'Proyectos inclasificables, bocetos, pruebas de concepto y exploraciones libres que alimentan el proceso creativo diario.'
+    }
+  };
+
+  /**
+   * Lee dinámicamente la variable CSS --panel-delay definida en :root
+   * para mantener sincronizados el CSS y JavaScript sin duplicar configuraciones
+   */
+  const getPanelDelayMs = () => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--panel-delay').trim();
+    if (raw.endsWith('ms')) return parseFloat(raw);
+    if (raw.endsWith('s')) return parseFloat(raw) * 1000;
+    return 600; // Valor de respaldo: 0.6s
+  };
+
   class CategoriesMenuController {
     constructor() {
       this.nav = document.getElementById('categoriesNav');
@@ -401,6 +603,15 @@
       this.activeLine = document.getElementById('categoryActiveLine');
       this.items = Array.from(document.querySelectorAll('.category-item'));
       this.display = document.getElementById('categoryDisplay');
+
+      // Elementos del panel lateral de descripción
+      this.panel = document.getElementById('categoryDescPanel') || document.getElementById('descriptionPanel');
+      this.panelTitle = document.getElementById('panelCategoryTitle') || document.getElementById('descTitle');
+      this.panelLine = document.getElementById('panelCategoryLine') || document.getElementById('descLine');
+      this.panelDesc = document.getElementById('panelCategoryDesc') || document.getElementById('descParagraph');
+      this.panelTextContainer = document.getElementById('panelTextContainer') || document.getElementById('descriptionTextInner');
+      this.panelTimer = null;
+      this.flyersManager = null;
 
       this.activeCategory = 'sobre-mi';
 
@@ -414,6 +625,8 @@
       this.bindResize();
       // Inicializar posición de la línea indicadora
       this.updateActiveLine(false);
+      // Inicializar texto de la categoría inicial
+      this.updateDescContent('sobre-mi');
     }
 
     bindCategoryClicks() {
@@ -449,30 +662,177 @@
       return false;
     }
 
-    selectCategory(categoryName, clickedBtn) {
+    /**
+     * Muestra el texto introductorio de Flyers en el panel derecho:
+     * Sin título y sin línea divisoria (solo el párrafo descriptivo)
+     */
+    showFlyersIntro() {
+      if (this.panelTextContainer) {
+        this.panelTextContainer.classList.add('is-changing');
+      }
+      setTimeout(() => {
+        if (this.panelTitle) {
+          this.panelTitle.textContent = '';
+          this.panelTitle.classList.add('is-hidden');
+        }
+        if (this.panelLine) {
+          this.panelLine.classList.add('is-hidden');
+        }
+        if (this.panelDesc) {
+          this.panelDesc.textContent = TEXTO_INTRO_FLYERS;
+        }
+        if (this.panelTextContainer) {
+          this.panelTextContainer.classList.remove('is-changing');
+        }
+      }, 120);
+    }
+
+    /**
+     * Muestra el título y descripción del flyer específico seleccionado en el feed
+     */
+    showFlyerDetail(flyer) {
+      if (this.panelTextContainer) {
+        this.panelTextContainer.classList.add('is-changing');
+      }
+      setTimeout(() => {
+        if (this.panelTitle) {
+          this.panelTitle.textContent = flyer.titulo;
+          this.panelTitle.classList.remove('is-hidden');
+        }
+        if (this.panelLine) {
+          this.panelLine.classList.remove('is-hidden');
+        }
+        if (this.panelDesc) {
+          this.panelDesc.textContent = flyer.descripcion;
+        }
+        if (this.panelTextContainer) {
+          this.panelTextContainer.classList.remove('is-changing');
+        }
+      }, 120);
+    }
+
+    updateDescContent(categoryName) {
+      if (categoryName === 'flyers') {
+        this.showFlyersIntro();
+        return;
+      }
+
+      // Otras categorías: mostrar título y línea normalmente
+      if (this.panelTitle) {
+        this.panelTitle.classList.remove('is-hidden');
+      }
+      if (this.panelLine) {
+        this.panelLine.classList.remove('is-hidden');
+      }
+
+      const data = CATEGORY_DATA[categoryName];
+      if (!data) return;
+
+      if (this.panelTitle) this.panelTitle.textContent = data.title;
+      if (this.panelDesc) this.panelDesc.textContent = data.desc;
+    }
+
+    /**
+     * Coreografía del Panel Lateral Derecho:
+     * 1. Si ya estaba abierto, resetea rápidamente hacia la derecha
+     * 2. Espera el tiempo configurable (--panel-delay: 0.6s)
+     * 3. Se desliza suavemente hacia la izquierda con cubic-bezier(0.16, 1, 0.3, 1) y 0.8s
+     */
+    triggerPanelSequence(categoryName, immediate = false) {
+      if (!this.panel) return;
+
+      clearTimeout(this.panelTimer);
+
+      const delayMs = immediate ? 0 : getPanelDelayMs();
+      const wasOpen = document.body.classList.contains('panel-open');
+
+      if (wasOpen && !immediate) {
+        // 1. Instante 0s: reset rápido si ya estaba abierto
+        this.panel.classList.add('is-resetting');
+        document.body.classList.remove('panel-open');
+        if (this.panelTextContainer) {
+          this.panelTextContainer.classList.add('is-changing');
+        }
+
+        // 2. Con Delay: entrada suave con el nuevo contenido
+        this.panelTimer = setTimeout(() => {
+          this.updateDescContent(categoryName);
+          this.panel.classList.remove('is-resetting');
+          document.body.classList.add('panel-open');
+          if (this.panelTextContainer) {
+            this.panelTextContainer.classList.remove('is-changing');
+          }
+        }, delayMs);
+      } else {
+        // Panel estaba cerrado: preparar contenido y entrar con delay
+        this.updateDescContent(categoryName);
+        this.panel.classList.remove('is-resetting');
+
+        if (immediate) {
+          document.body.classList.add('panel-open');
+        } else {
+          this.panelTimer = setTimeout(() => {
+            document.body.classList.add('panel-open');
+          }, delayMs);
+        }
+      }
+    }
+
+    closeDescPanel() {
+      clearTimeout(this.panelTimer);
+      if (this.panel) {
+        this.panel.classList.remove('is-resetting');
+      }
+      document.body.classList.remove('panel-open');
+      if (this.flyersManager) {
+        this.flyersManager.onLeaveCategory();
+      }
+    }
+
+    selectCategory(categoryName, clickedBtn, immediate = false) {
       if (!clickedBtn) {
         clickedBtn = this.items.find(btn => btn.dataset.category === categoryName);
       }
       if (!clickedBtn) return;
 
-      if (this.activeCategory === categoryName && clickedBtn.classList.contains('is-active')) {
+      const isSame = (this.activeCategory === categoryName && clickedBtn.classList.contains('is-active'));
+      if (isSame && document.body.classList.contains('panel-open')) {
+        if (categoryName === 'flyers' && this.flyersManager?.selectedCard) {
+          this.flyersManager.deselectAll(true);
+        }
         return;
       }
 
       this.activeCategory = categoryName;
 
-      // 1. Actualizar estados de los botones (aria-selected y clase is-active)
+      // 1. Instante 0s: Actualizar estados de botones inmediatamente
       this.items.forEach((btn) => {
         const isCurrent = (btn === clickedBtn);
         btn.classList.toggle('is-active', isCurrent);
         btn.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
       });
 
-      // 2. Deslizar fluidamente la barra indicadora de 52px con cubic-bezier
+      // 2. Deslizar fluidamente la barra indicadora
       this.updateActiveLine(true);
 
-      // 3. Notificar y alternar visibilidad de los paneles del contenedor principal
+      // 3. Notificar y alternar visibilidad de los paneles del stage central
       this.updateDisplayPanel(categoryName);
+
+      // 4. Iniciar o pausar galería de flyers, aleatorización y cinta de empaque
+      if (categoryName === 'flyers') {
+        if (this.flyersManager) {
+          this.flyersManager.onEnterCategory();
+        }
+      } else {
+        if (this.flyersManager) {
+          this.flyersManager.onLeaveCategory();
+        }
+      }
+
+      // 5. Coreografía del Panel Lateral Derecho de Descripción (solo en Frame 2)
+      if (document.body.getAttribute('data-frame') === '2') {
+        this.triggerPanelSequence(categoryName, immediate);
+      }
     }
 
     updateActiveLine(smooth = true) {
@@ -529,7 +889,478 @@
   }
 
   /* --------------------------------------------------------------------------
-   * 6. BOOTSTRAP DE LA APLICACIÓN
+   * 6. GESTOR DE GALERÍA, CINTA DE EMPAQUE Y ROTACIONES DE FLYERS
+   * -------------------------------------------------------------------------- */
+  class FlyersGalleryManager {
+    constructor(categoriesController) {
+      this.categoriesController = categoriesController;
+      this.scrollContainer = document.getElementById('flyersScrollContainer');
+      this.grid = document.getElementById('flyersColumnsGrid');
+      this.col1 = document.getElementById('flyersCol1');
+      this.col2 = document.getElementById('flyersCol2');
+
+      this.cards = [];
+      this.intervals = [];
+      this.shuffledList = [];
+      this.selectedFlyerIndex = null;
+      this.selectedCard = null;
+
+      // Parámetros de la cinta de empaque (auto-scroll más rápido y continuo)
+      this.isAutoScrolling = false;
+      this.autoScrollSpeed = (typeof VELOCIDAD_CINTA_FLYERS !== 'undefined') ? VELOCIDAD_CINTA_FLYERS : 68;
+      this.accumulatedScroll = 0;
+      this.lastFrameTime = 0;
+      this.rafId = null;
+      this.batchHeight = 0;
+      this.entranceDelayTimer = null;
+      this.selectionTimestamp = 0;
+
+      this.col1Batch1 = null;
+      this.col2Batch1 = null;
+      this.col1Batch2 = null;
+      this.col2Batch2 = null;
+
+      this.init();
+    }
+
+    init() {
+      this.shuffleAndRender();
+      this.bindEvents();
+    }
+
+    /**
+     * Baraja aleatoriamente los flyers y crea dos lotes idénticos en cada columna
+     * para lograr un bucle infinito matemáticamente continuo ("cinta de empaque")
+     */
+    shuffleAndRender() {
+      if (!this.col1 || !this.col2) return;
+
+      this.stopAutoScroll();
+      this.stopRotations();
+      this.selectedFlyerIndex = null;
+      this.selectedCard = null;
+
+      this.col1.innerHTML = '';
+      this.col2.innerHTML = '';
+      this.cards = [];
+
+      // 1. Barajar aleatoriamente la lista de flyers (Fisher-Yates Shuffle)
+      const list = [...LISTA_FLYERS];
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+      this.shuffledList = list;
+
+      // 2. Crear contenedores de lotes (Batch 1 y Batch 2 para el loop infinito)
+      this.col1Batch1 = document.createElement('div');
+      this.col1Batch1.className = 'flyers-batch flyers-batch-1';
+      this.col1Batch2 = document.createElement('div');
+      this.col1Batch2.className = 'flyers-batch flyers-batch-2';
+
+      this.col2Batch1 = document.createElement('div');
+      this.col2Batch1.className = 'flyers-batch flyers-batch-1';
+      this.col2Batch2 = document.createElement('div');
+      this.col2Batch2.className = 'flyers-batch flyers-batch-2';
+
+      // 3. Distribuir de forma alternada (par a Columna 1, impar a Columna 2)
+      // Lote 1 (Principal):
+      list.forEach((item, index) => {
+        const isCol2 = (index % 2 !== 0);
+        const cardObj = this.createCardElement(item, index, false);
+        if (isCol2) {
+          this.col2Batch1.appendChild(cardObj.card);
+        } else {
+          this.col1Batch1.appendChild(cardObj.card);
+        }
+        this.cards.push(cardObj);
+      });
+
+      // Lote 2 (Duplicado exacto para bucle infinito sin salto visual):
+      list.forEach((item, index) => {
+        const isCol2 = (index % 2 !== 0);
+        const cloneObj = this.createCardElement(item, index, true);
+        if (isCol2) {
+          this.col2Batch2.appendChild(cloneObj.card);
+        } else {
+          this.col1Batch2.appendChild(cloneObj.card);
+        }
+        this.cards.push(cloneObj);
+      });
+
+      this.col1.appendChild(this.col1Batch1);
+      this.col1.appendChild(this.col1Batch2);
+      this.col2.appendChild(this.col2Batch1);
+      this.col2.appendChild(this.col2Batch2);
+
+      this.equalizeBatchHeights();
+    }
+
+    createCardElement(item, index, isClone = false) {
+      const card = document.createElement('article');
+      card.className = 'flyer-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', item.titulo);
+      card.dataset.index = index;
+      if (isClone) card.dataset.clone = 'true';
+
+      const mediaWrap = document.createElement('div');
+      mediaWrap.className = 'flyer-media-wrap';
+
+      const basePath = CARPETA_FLYERS.endsWith('/') ? CARPETA_FLYERS : `${CARPETA_FLYERS}/`;
+      const firstFile = item.archivos[0];
+      const baseImg = document.createElement('img');
+      baseImg.className = 'flyer-img-base';
+      baseImg.src = `${basePath}${encodeURI(firstFile)}`;
+      baseImg.alt = item.titulo;
+      baseImg.draggable = false;
+      baseImg.loading = 'eager';
+      mediaWrap.appendChild(baseImg);
+
+      const rotatingLayers = [];
+      if (item.archivos.length > 1) {
+        item.archivos.forEach((file, fileIdx) => {
+          const layerImg = document.createElement('img');
+          layerImg.className = `flyer-img-layer ${fileIdx === 0 ? 'is-active' : ''}`;
+          layerImg.src = `${basePath}${encodeURI(file)}`;
+          layerImg.alt = `${item.titulo} - variación ${fileIdx + 1}`;
+          layerImg.draggable = false;
+          layerImg.loading = 'lazy';
+          mediaWrap.appendChild(layerImg);
+          rotatingLayers.push(layerImg);
+        });
+
+        // Badge indicador de variaciones (Star Wars y PS1)
+        const badge = document.createElement('div');
+        badge.className = 'flyer-series-badge';
+        badge.innerHTML = `<span class="badge-curr">1</span>/<span class="badge-total">${item.archivos.length}</span>`;
+        card.appendChild(badge);
+      }
+
+      card.appendChild(mediaWrap);
+
+      // Selección al clickear
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleSelect(index, card);
+      });
+
+      // Selección accesible por teclado
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.toggleSelect(index, card);
+        }
+      });
+
+      // Recalcular balance de alturas cuando las imágenes cargan
+      baseImg.addEventListener('load', () => {
+        this.equalizeBatchHeights();
+      });
+
+      return {
+        card,
+        item,
+        index,
+        isClone,
+        rotatingLayers,
+        currentFileIdx: 0,
+        intervalMs: item.intervalo || 1800
+      };
+    }
+
+    /**
+     * Sincroniza las alturas de los lotes entre ambas columnas para que
+     * la cinta de empaque repita su ciclo en el píxel exacto sin saltos.
+     */
+    equalizeBatchHeights() {
+      if (!this.col1Batch1 || !this.col2Batch1) return;
+
+      this.col1Batch1.style.minHeight = '0px';
+      this.col2Batch1.style.minHeight = '0px';
+      if (this.col1Batch2) this.col1Batch2.style.minHeight = '0px';
+      if (this.col2Batch2) this.col2Batch2.style.minHeight = '0px';
+
+      const h1 = this.col1Batch1.offsetHeight;
+      const h2 = this.col2Batch1.offsetHeight;
+      const maxH = Math.max(h1, h2);
+
+      if (maxH > 100) {
+        this.batchHeight = maxH;
+        this.col1Batch1.style.minHeight = `${maxH}px`;
+        this.col2Batch1.style.minHeight = `${maxH}px`;
+        if (this.col1Batch2) this.col1Batch2.style.minHeight = `${maxH}px`;
+        if (this.col2Batch2) this.col2Batch2.style.minHeight = `${maxH}px`;
+      }
+    }
+
+    bindEvents() {
+      // 1. Clic fuera de cualquier tarjeta deselecciona inmediatamente y reanuda la cinta
+      document.addEventListener('click', (e) => {
+        if (this.selectedCard && !e.target.closest('.flyer-card')) {
+          this.deselectAll();
+        }
+      });
+
+      // 2. Al scrollear (rueda del mouse o gesto táctil) con un flyer marcado:
+      // se desmarca automáticamente y la cinta vuelve a rodar
+      const handleScrollWhileSelected = () => {
+        if (this.categoriesController?.activeCategory === 'flyers' && this.selectedCard) {
+          if (performance.now() - this.selectionTimestamp < 180) return;
+          this.deselectAll(true);
+        }
+      };
+
+      window.addEventListener('wheel', handleScrollWhileSelected, { passive: true });
+      window.addEventListener('touchmove', handleScrollWhileSelected, { passive: true });
+
+      // 3. Tecla Escape para deseleccionar de forma accesible
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.selectedCard) {
+          this.deselectAll();
+        }
+      });
+
+      // 4. Ajuste responsivo de la altura de los lotes
+      window.addEventListener('resize', () => {
+        this.equalizeBatchHeights();
+      });
+    }
+
+    /**
+     * Bucle continuo de la Cinta de Empaque con requestAnimationFrame
+     * No se detiene al scrollear manualmente; solo se pausa al clickear un flyer.
+     */
+    startAutoScroll() {
+      this.stopAutoScroll();
+      this.isAutoScrolling = true;
+      this.lastFrameTime = performance.now();
+      this.accumulatedScroll = 0;
+
+      const step = () => {
+        if (!this.isAutoScrolling) return;
+
+        const now = performance.now();
+        const dt = Math.min((now - this.lastFrameTime) / 1000, 0.1);
+        this.lastFrameTime = now;
+
+        // Solo se detiene si hay un flyer seleccionado
+        if (this.selectedFlyerIndex === null && this.scrollContainer) {
+          this.accumulatedScroll += this.autoScrollSpeed * dt;
+          if (this.accumulatedScroll >= 0.75) {
+            this.scrollContainer.scrollTop += this.accumulatedScroll;
+            this.accumulatedScroll = 0;
+          }
+        }
+
+        // Bucle continuo: cuando el scroll supera el primer lote, resta exactamente su altura
+        if (this.batchHeight > 200 && this.scrollContainer) {
+          if (this.scrollContainer.scrollTop >= this.batchHeight) {
+            this.scrollContainer.scrollTop -= this.batchHeight;
+          } else if (this.scrollContainer.scrollTop < 0) {
+            this.scrollContainer.scrollTop += this.batchHeight;
+          }
+        }
+
+        this.rafId = requestAnimationFrame(step);
+      };
+
+      this.rafId = requestAnimationFrame(step);
+    }
+
+    stopAutoScroll() {
+      this.isAutoScrolling = false;
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+    }
+
+    /**
+     * Detiene la cinta, agranda el flyer con escala, aplica borde y lo centra
+     */
+    toggleSelect(index, cardEl) {
+      if (this.selectedCard === cardEl) {
+        this.deselectAll();
+      } else {
+        this.selectFlyer(index, cardEl);
+      }
+    }
+
+    selectFlyer(index, cardEl) {
+      this.selectedFlyerIndex = index;
+      this.selectedCard = cardEl;
+      this.selectionTimestamp = performance.now();
+
+      // 1. Detener inmediatamente la cinta de empaque
+      this.stopAutoScroll();
+
+      // 2. Activar clase en la grilla y jerarquía de z-index entre columnas
+      const isCol1 = Boolean(cardEl.closest('.flyers-col-1'));
+      if (this.grid) {
+        this.grid.classList.add('has-selected');
+        this.grid.classList.toggle('has-selected-col1', isCol1);
+        this.grid.classList.toggle('has-selected-col2', !isCol1);
+      }
+      if (this.col1 && this.col2) {
+        this.col1.style.zIndex = isCol1 ? '60' : '1';
+        this.col2.style.zIndex = isCol1 ? '1' : '60';
+      }
+
+      // 3. Actualizar estado visual y escala en las tarjetas
+      this.cards.forEach((c) => {
+        const isCurrent = (c.card === cardEl);
+        c.card.classList.toggle('is-selected', isCurrent);
+      });
+
+      // 4. Centrar suavemente en el flyer seleccionado
+      this.centerCard(cardEl);
+
+      // 5. Mostrar título y descripción en el panel derecho
+      const flyer = this.shuffledList[index];
+      if (this.categoriesController && flyer) {
+        this.categoriesController.showFlyerDetail(flyer);
+      }
+    }
+
+    centerCard(cardEl) {
+      if (!this.scrollContainer || !cardEl) return;
+
+      const containerRect = this.scrollContainer.getBoundingClientRect();
+      const cardRect = cardEl.getBoundingClientRect();
+
+      const cardCenter = cardRect.top + cardRect.height / 2;
+      const containerCenter = containerRect.top + containerRect.height / 2;
+      const deltaY = cardCenter - containerCenter;
+
+      let targetScrollTop = this.scrollContainer.scrollTop + deltaY;
+
+      // Mantener targetScrollTop dentro del rango del bucle continuo sin topar en 0
+      if (this.batchHeight > 200) {
+        if (targetScrollTop < 0) {
+          this.scrollContainer.scrollTop += this.batchHeight;
+          targetScrollTop += this.batchHeight;
+        } else if (targetScrollTop >= this.batchHeight * 1.5) {
+          this.scrollContainer.scrollTop -= this.batchHeight;
+          targetScrollTop -= this.batchHeight;
+        }
+      }
+
+      this.scrollContainer.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
+    }
+
+    deselectAll(resumeAutoScroll = true) {
+      if (this.selectedFlyerIndex === null && !this.selectedCard) return;
+
+      this.selectedFlyerIndex = null;
+      this.selectedCard = null;
+
+      // Quitar clases de enfoque en la grilla y restablecer z-index de columnas
+      if (this.grid) {
+        this.grid.classList.remove('has-selected', 'has-selected-col1', 'has-selected-col2');
+      }
+      if (this.col1 && this.col2) {
+        this.col1.style.zIndex = '';
+        this.col2.style.zIndex = '';
+      }
+
+      this.cards.forEach(c => c.card.classList.remove('is-selected'));
+
+      // Restaurar texto introductorio en el panel derecho solo si seguimos en Flyers
+      if (this.categoriesController && this.categoriesController.activeCategory === 'flyers') {
+        this.categoriesController.showFlyersIntro();
+      }
+
+      // Reanudar la cinta de empaque solo si se solicita y estamos en Flyers
+      if (resumeAutoScroll && this.categoriesController?.activeCategory === 'flyers') {
+        this.startAutoScroll();
+      }
+    }
+
+    /**
+     * Rotación de variaciones para Star Wars y PS1
+     * Sincroniza ambas apariciones (original y duplicada en el loop)
+     */
+    startRotations() {
+      this.stopRotations();
+
+      const multiCards = this.cards.filter(c => c.rotatingLayers.length > 1);
+      const groups = new Map();
+
+      multiCards.forEach((cardObj) => {
+        if (!groups.has(cardObj.item)) {
+          groups.set(cardObj.item, []);
+        }
+        groups.get(cardObj.item).push(cardObj);
+      });
+
+      groups.forEach((groupCards, item) => {
+        const intervalMs = item.intervalo || 1800;
+        let currentIdx = 0;
+        const total = item.archivos.length;
+
+        const timer = setInterval(() => {
+          const nextIdx = (currentIdx + 1) % total;
+          groupCards.forEach((cardObj) => {
+            cardObj.rotatingLayers[currentIdx]?.classList.remove('is-active');
+            cardObj.rotatingLayers[nextIdx]?.classList.add('is-active');
+            const badgeCurr = cardObj.card.querySelector('.badge-curr');
+            if (badgeCurr) badgeCurr.textContent = (nextIdx + 1).toString();
+          });
+          currentIdx = nextIdx;
+        }, intervalMs);
+
+        this.intervals.push(timer);
+      });
+    }
+
+    stopRotations() {
+      this.intervals.forEach(id => clearInterval(id));
+      this.intervals = [];
+    }
+
+    /**
+     * Invocado al entrar a la categoría "Flyers"
+     */
+    onEnterCategory() {
+      clearTimeout(this.entranceDelayTimer);
+
+      // 1. Cada vez que entra, baraja aleatoriamente los flyers
+      this.shuffleAndRender();
+
+      // 2. Resetea el scroll al inicio
+      if (this.scrollContainer) {
+        this.scrollContainer.scrollTop = 0;
+      }
+
+      // 3. Inicia las rotaciones de Star Wars y PS1
+      this.startRotations();
+
+      // 4. Inicia la cinta de empaque una vez concluida la entrada de guillotina (~900ms)
+      this.entranceDelayTimer = setTimeout(() => {
+        this.equalizeBatchHeights();
+        this.startAutoScroll();
+      }, 920);
+    }
+
+    /**
+     * Invocado al salir de la categoría "Flyers"
+     */
+    onLeaveCategory() {
+      clearTimeout(this.entranceDelayTimer);
+      this.deselectAll(false);
+      this.stopAutoScroll();
+      this.stopRotations();
+      // Nota: no resetear scrollTop aquí para permitir que la animación de salida por guillotina sea fluida
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+   * 7. BOOTSTRAP DE LA APLICACIÓN
    * -------------------------------------------------------------------------- */
   const init = () => {
     initLoadAnimation();
@@ -537,12 +1368,16 @@
     new ContinuousInkAnimation();
 
     const categoriesController = new CategoriesMenuController();
+    const flyersManager = new FlyersGalleryManager(categoriesController);
+    categoriesController.flyersManager = flyersManager;
+
     const frameController = new FrameTransitionController(categoriesController);
 
     // Exponer globalmente para depuración o llamadas desde consola si se requiere
     window.portfolio = {
       frameController,
-      categoriesController
+      categoriesController,
+      flyersManager
     };
   };
 

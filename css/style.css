@@ -25,12 +25,12 @@
   --max-width-subtitle: 500px;
 
   /* Proporciones Desktop Frame 2 (left: 2.19% ~42px, top: 3.43% ~37px) */
-  --margin-left-axis-f2: 2.19vw; /* ~42px en FHD */
+  --margin-left-axis-f2: 1.2vw;  /* Más pegado a la izquierda */
   --top-title-f2: 3.43vh;        /* ~37px en FHD */
   --width-title-f2: 20.91vw;     /* ~401px en FHD */
   --max-width-title-f2: 401px;
 
-  --top-categories-f2: 15vh;     /* ~162px en FHD */
+  --top-categories-f2: 19vh;     /* Más separado del título */
 
   /* Isotipo Esquina Inferior Derecha (Común a ambos frames) */
   --pos-logo-right: 4.57vw;
@@ -41,9 +41,14 @@
 
   /* Tipografía */
   --font-size-author: clamp(1.2rem, 2.08vw, 40px);
-  --font-size-cat-active: clamp(1.5rem, 1.875vw, 36px);
-  --font-size-cat-inactive: clamp(1.1rem, 1.25vw, 24px);
+  --font-size-cat-active: clamp(1.2rem, 1.5vw, 28px);
+  --font-size-cat-inactive: clamp(0.9rem, 1.05vw, 20px);
   --line-active-width: 52px;     /* 2.71vw en Figma */
+
+  /* Panel Lateral Derecho (Descripción) */
+  --panel-delay: 0.6s;           /* Delay configurable antes de que aparezca el panel */
+  --panel-width: 20vw;           /* Más angosto y tirado a la derecha (~384px en 1920x1080) */
+  --panel-color: #FFFEF6;        /* Crema claro del rectángulo */
 }
 
 *, *::before, *::after {
@@ -94,8 +99,7 @@ html, body {
   pointer-events: none;
   z-index: 1;
   opacity: 0;
-  filter: blur(0.25px);
-  transition: opacity 1.5s var(--ease-out-expo);
+  transition: opacity 1.2s var(--ease-out-expo);
 }
 
 body.loaded .tech-grid {
@@ -287,7 +291,7 @@ body[data-frame="2"] .categories-nav {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: clamp(14px, 1.8vh, 22px);
+  gap: clamp(6px, 0.9vh, 12px);
   position: relative;
 }
 
@@ -331,8 +335,18 @@ body[data-frame="2"] .categories-nav {
 
 /* Al entrar al Frame 2: cada categoría brota de su guillotina de forma escalonada una vez que el título termina su viaje */
 body[data-frame="2"] .category-item {
-  transform: translateY(0%);
+  transform: translateX(0) translateY(0%);
   opacity: 1;
+}
+
+/* Categoría activa se desplaza hacia adelante (derecha) */
+body[data-frame="2"] .category-item.is-active {
+  transform: translateX(14px) translateY(0%);
+}
+
+/* Transición suave del desplazamiento al cambiar categorías (después de la entrada) */
+.categories-nav.is-ready .category-item {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
 body[data-frame="2"] .category-wrapper:nth-child(1) .category-item {
@@ -358,7 +372,7 @@ body[data-frame="2"] .category-wrapper:nth-child(6) .category-item {
 .category-label {
   display: inline-block;
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(1.15rem, 1.25vw, 24px);
+  font-size: clamp(0.95rem, 1.05vw, 20px);
   line-height: 1.25;
   transform-origin: left 70%;
   transition: 
@@ -409,7 +423,7 @@ body[data-frame="2"] .category-wrapper:nth-child(6) .category-item {
   font-weight: 400;
   font-variation-settings: 'wght' 400;
   opacity: 1;
-  transform: scale(1.42) translateX(0);
+  transform: scale(1.25);
   cursor: default;
 }
 
@@ -441,18 +455,22 @@ body[data-frame="2"] .category-active-line {
 }
 
 /* ==========================================================================
-   FRAME 2: CONTENEDOR PRINCIPAL DINÁMICO (left: 25% hasta right: 5%)
+   FRAME 2: CONTENEDOR CENTRAL (Stage de Contenido)
+   Espacio entre menú izquierdo y panel derecho (left: 24vw, width: 52vw)
    ========================================================================== */
 .category-display {
   position: absolute;
-  left: 25vw;
-  right: 5vw;
-  top: 15vh;
-  bottom: 5vh;
+  left: 24vw;
+  width: 52vw;
+  top: 0;
+  bottom: 0;
   z-index: 10;
   opacity: 0;
   pointer-events: none;
   transform: translateY(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: 
     opacity 0.4s ease,
     transform 0.5s var(--ease-out-expo);
@@ -488,7 +506,253 @@ body[data-frame="2"] .category-display {
 }
 
 /* ==========================================================================
+   FEED DE FLYERS (Categoría "Flyers")
+   Cinta de empaque con entrada de guillotina arquitectónica y ritmo disparejo
+   ========================================================================== */
+#panel-flyers {
+  overflow: hidden;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transform: none !important;
+  transition: opacity 0.52s ease;
+}
+
+#panel-flyers.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.35s ease;
+}
+
+/* Guillotina: Salida escalonada hacia abajo (misma coreografía que la entrada, pero más rápida) */
+#panel-flyers:not(.is-active) .flyers-col-1 {
+  transform: translateY(100vh);
+  opacity: 0;
+  transition: 
+    transform 0.50s cubic-bezier(0.38, 0, 0.24, 1) 0.06s,
+    opacity 0.42s ease 0.06s;
+}
+
+#panel-flyers:not(.is-active) .flyers-col-2 {
+  transform: translateY(100vh);
+  opacity: 0;
+  transition: 
+    transform 0.50s cubic-bezier(0.38, 0, 0.24, 1) 0s,
+    opacity 0.42s ease 0s;
+}
+
+/* Al activarse: entran en guillotina escalonada desde abajo hacia su posición natural */
+#panel-flyers.is-active .flyers-col-1 {
+  transform: translateY(0%);
+  opacity: 1;
+  transition: 
+    transform 0.88s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+    opacity 0.45s ease 0.08s;
+}
+
+#panel-flyers.is-active .flyers-col-2 {
+  transform: translateY(0%);
+  opacity: 1;
+  transition: 
+    transform 0.88s cubic-bezier(0.16, 1, 0.3, 1) 0.20s,
+    opacity 0.45s ease 0.20s;
+}
+
+.flyers-scroll-container {
+  width: 100%;
+  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 clamp(18px, 2.2vw, 36px) 14vh clamp(18px, 2.2vw, 36px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.flyers-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.flyers-columns-grid {
+  display: flex;
+  gap: clamp(14px, 1.6vw, 24px);
+  width: 100%;
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.flyers-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  will-change: transform, opacity;
+  overflow: visible;
+}
+
+/* Lotes de tarjetas para el bucle continuo de la cinta de empaque */
+.flyers-batch {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vw, 24px);
+  width: 100%;
+  padding-bottom: clamp(14px, 1.8vw, 24px);
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+/* Ritmo disparejo orgánico: Columna 2 desfasada verticalmente hacia abajo */
+.flyers-col-2 .flyers-batch {
+  padding-top: clamp(38px, 5.5vh, 76px);
+}
+
+/* Gestión de apilamiento para que la columna activa se superponga siempre a la otra */
+.flyers-columns-grid.has-selected-col1 .flyers-col-1 {
+  z-index: 60;
+  position: relative;
+}
+.flyers-columns-grid.has-selected-col1 .flyers-col-2 {
+  z-index: 1;
+  position: relative;
+}
+
+.flyers-columns-grid.has-selected-col2 .flyers-col-2 {
+  z-index: 60;
+  position: relative;
+}
+.flyers-columns-grid.has-selected-col2 .flyers-col-1 {
+  z-index: 1;
+  position: relative;
+}
+
+/* Tarjeta individual de flyer */
+.flyer-card {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #171717;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  opacity: 1;
+  transition: 
+    transform 0.52s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.52s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    filter 0.45s ease;
+  will-change: transform;
+}
+
+.flyer-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+}
+
+/* Flyer seleccionado: se agranda a 1.34x y se desplaza hacia el centro del stage */
+.flyers-col-1 .flyer-card.is-selected,
+.flyers-col-1 .flyer-card.is-selected:hover {
+  transform: translateX(calc(50% + (clamp(14px, 1.6vw, 24px) / 2))) scale(1.34) !important;
+  z-index: 100 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 32px 70px rgba(0, 0, 0, 0.92),
+    0 10px 25px rgba(0, 0, 0, 0.7);
+}
+
+.flyers-col-2 .flyer-card.is-selected,
+.flyers-col-2 .flyer-card.is-selected:hover {
+  transform: translateX(calc(-50% - (clamp(14px, 1.6vw, 24px) / 2))) scale(1.34) !important;
+  z-index: 100 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 32px 70px rgba(0, 0, 0, 0.92),
+    0 10px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* Enfoque de galería: las demás tarjetas se atenúan en brillo pero permanecen 100% sólidas (sin transparencia) */
+.flyers-columns-grid.has-selected .flyer-card:not(.is-selected) {
+  opacity: 1;
+  filter: brightness(0.38) saturate(0.6);
+}
+
+/* Contenedor de medios del flyer */
+.flyer-media-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+}
+
+.flyer-img-base {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flyer-img-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flyer-img-layer.is-active {
+  opacity: 1;
+}
+
+/* Badge sutil para flyers múltiples que rotan */
+.flyer-series-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #FFFFFF;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  opacity: 0.75;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flyer-card:hover .flyer-series-badge {
+  opacity: 1;
+}
+
+/* Ocultar título y línea divisoria cuando solo se muestra texto introductorio */
+.panel-category-title.is-hidden,
+.panel-category-line.is-hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
    ISOTIPO (logo.svg) EN ESQUINA INFERIOR DERECHA
+   Doble logo (blanco + oscuro) con crossfade sincronizado al panel derecho
    ========================================================================== */
 .hero-logo-wrapper {
   position: absolute;
@@ -497,8 +761,8 @@ body[data-frame="2"] .category-display {
   width: var(--width-logo);
   max-width: var(--max-width-logo);
   min-width: var(--min-width-logo);
-  z-index: 30;
-  overflow: hidden;
+  z-index: 35;
+  overflow: visible;
   padding-bottom: 4px;
 }
 
@@ -508,23 +772,215 @@ body[data-frame="2"] .category-display {
   cursor: default;
   outline: none;
   text-decoration: none;
+  position: relative;
 }
 
 .hero-logo {
   display: block;
   width: 100%;
   height: auto;
+  will-change: transform, opacity;
+}
+
+/* Logo blanco (por defecto en Frame 1 y cuando el panel está cerrado) */
+.hero-logo-light {
+  position: relative;
   transform: translateY(120%);
   opacity: 0;
   transition: 
     transform 0.9s var(--ease-out-expo) 0.70s,
-    opacity 0.4s ease 0.70s;
-  will-change: transform, opacity;
+    opacity 0.35s ease 0s;
 }
 
-body.loaded .hero-logo {
+body.loaded .hero-logo-light {
   transform: translateY(0%);
   opacity: 1;
+}
+
+/* Logo oscuro (se superpone exactamente sobre el blanco en la misma posición) */
+.hero-logo-dark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+  transition: 
+    transform 0.9s var(--ease-out-expo) 0.70s,
+    opacity 0.35s ease 0s;
+}
+
+body.loaded .hero-logo-dark {
+  transform: translateY(0%);
+  opacity: 0;
+}
+
+/* Cuando el panel claro está abierto: el logo cambia de color rápidamente */
+body.panel-open .hero-logo-light {
+  opacity: 0;
+  transition: opacity 0.16s ease calc(var(--panel-delay, 0.6s) + 0.06s);
+}
+
+body.panel-open .hero-logo-dark {
+  opacity: 1;
+  transition: opacity 0.16s ease calc(var(--panel-delay, 0.6s) + 0.06s);
+}
+
+/* Cuando el panel se cierra */
+body:not(.panel-open) .hero-logo-light {
+  opacity: 1;
+  transition: opacity 0.14s ease 0s;
+}
+
+body:not(.panel-open) .hero-logo-dark {
+  opacity: 0;
+  transition: opacity 0.14s ease 0s;
+}
+
+/* ==========================================================================
+   FRAME 2: PANEL LATERAL DERECHO (Descripción de Categoría)
+   right: 0, top: 0, bottom: 0, width: ~20vw (~384px en FHD)
+   Fondo crema (#FFFEF6) y contenedor de texto
+   ========================================================================== */
+.category-desc-panel,
+.description-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--panel-width, 20vw);
+  max-width: 420px;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 20;
+  background-color: var(--panel-color, #FFFEF6);
+  transform: translateX(100%);
+  opacity: 1;
+  pointer-events: none;
+  overflow: hidden;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.2);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--panel-delay, 0.6s);
+  will-change: transform;
+}
+
+/* Estado abierto: entra deslizándose suavemente desde la derecha */
+body.panel-open .category-desc-panel,
+body.panel-open .description-panel {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Modo reset rápido para cuando se clickea otra categoría mientras estaba abierto */
+.category-desc-panel.is-resetting,
+.description-panel.is-resetting {
+  transform: translateX(100%) !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+}
+
+/* Fondo con el SVG claro (Group 20.svg) */
+.desc-panel-bg,
+.description-panel-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.desc-panel-grid,
+.description-panel-svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: auto;
+  min-width: 100%;
+  object-fit: cover;
+  object-position: right top;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* Contenedor de contenido y texto */
+.panel-content-wrapper,
+.description-panel-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.panel-text-container,
+.description-text-inner {
+  padding: clamp(3rem, 4.5vh, 4rem) clamp(1.6rem, 2vw, 2.4rem);
+  color: #212121;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  opacity: 1;
+  transform: translateY(0);
+  transition: 
+    opacity 0.35s ease,
+    transform 0.4s var(--ease-out-expo);
+}
+
+.panel-text-container.is-changing,
+.description-text-inner.is-changing {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: 
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.panel-category-tag,
+.desc-tag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #212121;
+  opacity: 0.55;
+  margin-bottom: 1.2rem;
+}
+
+.panel-category-title,
+.desc-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.8rem, 2.2vw, 38px);
+  font-weight: 300;
+  line-height: 1.15;
+  color: #212121;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.2rem;
+}
+
+.panel-category-line,
+.desc-line {
+  width: 38px;
+  height: 2px;
+  background-color: #212121;
+  border-radius: 999px;
+  margin-bottom: 1.8rem;
+  opacity: 0.75;
+}
+
+.panel-category-desc,
+.desc-paragraph {
+  font-size: clamp(0.9rem, 1vw, 16px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: #212121;
+  opacity: 0.85;
 }
 
 /* ==========================================================================
@@ -542,11 +998,12 @@ body.loaded .hero-logo {
     --top-categories-f2: 13vh;
     --font-size-cat-active: 30px;
     --font-size-cat-inactive: 20px;
+    --panel-width: 25vw;
   }
 
   .category-display {
-    left: 35vw;
-    right: 4vw;
+    left: 28vw;
+    width: 44vw;
   }
 }
 
@@ -580,13 +1037,19 @@ body.loaded .hero-logo {
     --font-size-cat-active: clamp(1.2rem, 5vw, 26px);
     --font-size-cat-inactive: clamp(0.95rem, 3.8vw, 18px);
     --line-active-width: 40px;
+    --panel-width: 0; /* Panel oculto en mobile */
   }
 
   .category-display {
     left: 6vw;
+    width: auto;
     right: 6vw;
     top: 48vh;
     bottom: 8vh;
+  }
+
+  .description-panel {
+    display: none;
   }
 
   .categories-list {
@@ -609,7 +1072,8 @@ body.loaded .hero-logo {
   .hero-author,
   .hero-logo,
   .categories-nav,
-  .category-display {
+  .category-display,
+  .description-panel {
     opacity: 1 !important;
     transform: none !important;
   }

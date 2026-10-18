@@ -133,7 +133,12 @@
 
       <!-- 2. Flyers -->
       <section class="category-panel" id="panel-flyers" role="tabpanel" aria-labelledby="tab-flyers">
-        <div class="category-panel-placeholder" data-panel="flyers"></div>
+        <div class="flyers-scroll-container" id="flyersScrollContainer">
+          <div class="flyers-columns-grid" id="flyersColumnsGrid">
+            <div class="flyers-col flyers-col-1" id="flyersCol1"></div>
+            <div class="flyers-col flyers-col-2" id="flyersCol2"></div>
+          </div>
+        </div>
       </section>
 
       <!-- 3. Multimediales -->
@@ -157,13 +162,31 @@
       </section>
     </main>
 
-    <!-- Isotipo esquina inferior derecha (Compartido en Frame 1 y Frame 2) -->
-    <aside class="hero-logo-wrapper" id="heroLogoWrapper">
-      <div class="hero-logo-link" aria-label="Isotipo Agustin Tabbita">
-        <img src="assets/svg/logo.svg" alt="Isotipo bb" class="hero-logo" draggable="false">
+    <!-- FRAME 2: Panel Lateral Derecho de Descripción (top: 0, right: 0, 100vh, ~20vw) -->
+    <aside class="category-desc-panel" id="categoryDescPanel" aria-label="Descripción de categoría">
+      <!-- Fondo claro con retícula técnica de Group 20.svg -->
+      <div class="desc-panel-bg" aria-hidden="true">
+        <img src="svg/Group 20.svg" alt="" class="desc-panel-grid" draggable="false">
+      </div>
+      <!-- Contenedor de contenido y texto -->
+      <div class="panel-content-wrapper" id="panelContentWrapper">
+        <div class="panel-text-container" id="panelTextContainer">
+          <h3 class="panel-category-title" id="panelCategoryTitle">Sobre mi</h3>
+          <div class="panel-category-line" id="panelCategoryLine" aria-hidden="true"></div>
+          <p class="panel-category-desc" id="panelCategoryDesc">
+            Diseñador multimedial enfocado en la convergencia entre diseño visual, código creativo e interacción. Exploración constante de nuevas estéticas y experiencias digitales.
+          </p>
+        </div>
       </div>
     </aside>
 
+    <!-- Isotipo esquina inferior derecha (Compartido en Frame 1 y Frame 2, transición a logo oscuro) -->
+    <aside class="hero-logo-wrapper" id="heroLogoWrapper">
+      <div class="hero-logo-link" aria-label="Isotipo Agustin Tabbita">
+        <img src="assets/svg/logo.svg" alt="Isotipo bb (claro)" class="hero-logo hero-logo-light" draggable="false">
+        <img src="svg/Capa 3.svg" alt="Isotipo bb (oscuro)" class="hero-logo hero-logo-dark" draggable="false">
+      </div>
+    </aside>
   </div>
 
   <!-- Script modular -->
