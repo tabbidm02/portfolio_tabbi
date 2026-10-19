@@ -18,77 +18,98 @@
   const CARPETA_FLYERS = './flyers/';
 
   // Texto introductorio inicial de la categoría (sin título, solo el párrafo):
-  const TEXTO_INTRO_FLYERS = "Piezas gráficas para eventos, recitales y activaciones culturales. Tipografía experimental, composición de alto impacto visual y tratamiento de imagen contemporáneo.";
+  const TEXTO_INTRO_FLYERS = "Flyers, posters, afiches, postales. Piezas graficas que hago de cosas que me gustan, de cosas que vi, de lo que me fanatice o que simplemente tenia ganas de hacer.";
+
+  // Configuración de Instagram y segundo párrafo para Flyers:
+  const URL_INSTAGRAM = "https://www.instagram.com/tabbidm02"; // Modificar con tu usuario de Instagram si es diferente
+  const TEXTO_INSTAGRAM_FLYERS = "Todos estos diseños y muchos máslos comparto en mi cuenta de Instagram";
+
+  // Fecha de nacimiento para cálculo dinámico de edad (2 de julio de 2002):
+  // Se actualiza automáticamente cada 2 de julio de cada año.
+  const NACIMIENTO_AGUSTIN = { anio: 2002, mes: 6, dia: 2 }; // Mes 6 = Julio (0-indexed en JavaScript)
+
+  const calcularEdad = (nacimiento = NACIMIENTO_AGUSTIN) => {
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.anio;
+    const mesActual = hoy.getMonth();
+    const diaActual = hoy.getDate();
+
+    if (mesActual < nacimiento.mes || (mesActual === nacimiento.mes && diaActual < nacimiento.dia)) {
+      edad--;
+    }
+    return edad;
+  };
 
   // Velocidad de la cinta de empaque en píxeles por segundo (Ajustable a gusto):
-  const VELOCIDAD_CINTA_FLYERS = 68;
+  const VELOCIDAD_CINTA_FLYERS = 95;
 
   // Lista de flyers y series:
-  // NOTA: Únicamente Star Wars y PS1 están agrupados en series rotatorias.
+  // NOTA: PlayStation, Star Wars y Exploración Visual están agrupados en series rotatorias.
   // Todos los demás flyers se presentan individualmente y su orden se baraja
   // aleatoriamente cada vez que se ingresa a la categoría "Flyers".
   const LISTA_FLYERS = [
     {
       archivos: ["DTmF post vertical@72x-100.jpg"],
-      titulo: "DTmF — Vito Carbonella & Ramón Zapico",
-      descripcion: "Afiche tipográfico y síntesis de alto contraste bicromático para fecha en vivo. Exploración de contornos dinámicos y jerarquía tipográfica brutalista."
+      titulo: "DTmF - Bad BUnny",
+      descripcion: "Afiche que hice cuando escuché por completo el álbum. Dibujos propios, muchas texturas y pruebas de composición."
     },
     {
       archivos: ["Mesa de trabajo 2@72x-100.jpg"],
-      titulo: "MDQ — Mar Del Plata",
-      descripcion: "Composición fotográfica de playa popular intervenida con tipografía condensada de gran escala. Cruce entre gráfica turística retro y estética urbana actual."
+      titulo: "MDQ - Mar Del Plata",
+      descripcion: "Poster de la hermosa ciudad de Mar Del Plata, con una fotografía propia de la playa Alfonsina, un bello día de Febrero."
     },
     {
       archivos: ["Cadaver exquisito_Mesa de trabajo 1.png"],
-      titulo: "Cadáver Exquisito — Vuelo",
-      descripcion: "Gráfica experimental basada en la técnica surrealista de ensamble. Fusión de figura escultórica y tipografía serif distorsionada en rojo profundo."
+      titulo: "Cadáver Exquisito",
+      descripcion: "Flyer un poco básico, de una de las mejores obras literarias que leí, probando con texturas."
     },
     {
       archivos: ["flayer 3 cato&paco.png"],
-      titulo: "Cato & Paco — Vol. 1",
-      descripcion: "Afiche promocional para fecha en vivo de Cato & Paco. Tratamiento de medios tonos, saturación ácida y tipografía rítmica."
+      titulo: "Cato & Paco - Ver.1",
+      descripcion: "Diseño que hice cuando Catriel y Paco sacaron su disco debut como duo."
     },
     {
       archivos: ["flayer 4 cato&paco.png"],
-      titulo: "Cato & Paco — Vol. 2",
-      descripcion: "Segunda entrega de la serie para Cato & Paco. Composición espejada, paleta de alto impacto cromático y balance tipográfico experimental."
+      titulo: "Cato & Paco - Ver.2",
+      descripcion: "Segundo diseño que hice cuando Catriel y Paco sacaron su disco debut como duo."
     },
     {
       archivos: ["Tunic Flayer_1.jpg"],
-      titulo: "Tunic — Edición I",
-      descripcion: "Interpretación visual inspirada en el videojuego indie. Ilustración vectorial de atmósfera mística y paleta tonal evocativa."
+      titulo: "Tunic - Ver.1",
+      descripcion: "Uno de los diseños que hice para este hermoso juego, me volvió loco la primera vez que lo jugué. Prueba con transparencias y texto."
     },
     {
       archivos: ["Tunic Flayer_2.jpg"],
-      titulo: "Tunic — Edición II",
-      descripcion: "Segunda variación gráfica sobre el universo de Tunic. Tratamiento atmosférico y simbología vectorial críptica."
+      titulo: "Tunic - Ver.2",
+      descripcion: "Diseño por lo que me enloqueció el juego de Tunic. Tratando de imitar algo más verosímil del juego."
     },
     {
       archivos: ["MISTERNA,CO-OFFLINE.png"],
-      titulo: "Misterna — Co-Offline",
-      descripcion: "Pieza promocional de corte minimalista y underground. Tensión visual a través de espacios negativos y modulación tipográfica."
+      titulo: "Misternacho - Offline",
+      descripcion: "Banner que hice para el streamer Misternacho para su canal de Kick, utilizado actualmente.",
+      scale: 2.6
     },
     {
       archivos: ["PORSCHE_Mesa de trabajo 1.jpg"],
-      titulo: "Porsche 911 — Serie Roja",
-      descripcion: "Homenaje a la silueta clásica del 911. Gráfica en bloque con rojo bermellón sólido, textura de grabado halftone y presencia vehicular imponente."
+      titulo: "Porsche 911",
+      descripcion: "En una época me fanatice con este auto, lo adoro. Jugué mucho con texturas además de contrastes de grises y rojos."
     },
     // --- SERIE AGRUPADA 1: PlayStation 30th Anniversary (Rotación de variaciones) ---
     {
       archivos: ["PS130th black.jpg", "PS130TH grey.jpg", "PS130TH withe.jpg"],
-      intervalo: 1600,
-      titulo: "PlayStation 30th Anniversary — Recolors",
-      descripcion: "Serie de tres variaciones tonales (Dark, Silver y Classic White) conmemorando los 30 años de la consola. Síntesis geométrica de la silueta icónica."
+      intervalo: 3000,
+      titulo: "PlayStation 30th Anniversary",
+      descripcion: "Una serie de Flyers que hice para el aniversario de la PlayStation 1, unos cuantos recolors"
     },
     {
       archivos: ["Horizon Flayer IG_1.jpg"],
-      titulo: "Horizon Zero Dawn — Bestiary I",
-      descripcion: "Afiche técnico estilizado tipo pergamino con tipografía tribal-futurista e ilustración monocromática de las máquinas del universo Horizon."
+      titulo: "Horizon Zero Dawn - Ver.1",
+      descripcion: "Uno de los primeros Flyers que hice, habia terminado de jugar este juego y necesitaba demostrar lo que me había gustado."
     },
     {
       archivos: ["Horizon Flayer IG_2.jpg"],
-      titulo: "Horizon Zero Dawn — Bestiary II",
-      descripcion: "Segunda lámina del bestiario Horizon. Documentación visual y esquemática de fauna robótica con estética de manual de campo."
+      titulo: "Horizon Zero Dawn - Ver.2",
+      descripcion: "Otro de los primeros Flyers que hice, habia terminado de jugar este juego y necesitaba demostrar lo que me había gustado."
     },
     // --- SERIE AGRUPADA 2: Star Wars (Colección rotatoria de carátulas) ---
     {
@@ -100,59 +121,58 @@
         "ig horizontal copia 4@72x-100.jpg",
         "ig horizontal copia 5@72x-100.jpg"
       ],
-      intervalo: 1800,
-      titulo: "Star Wars — Serie de Carátulas",
-      descripcion: "Colección de 6 carátulas panorámicas para redes sociales recorriendo los episodios de la saga. Composición cinematográfica y gradaciones tonales temáticas."
+      intervalo: 3000,
+      titulo: "Star Wars - Carátulas",
+      descripcion: "Colección de carátulas que hice de la saga de Star Wars, jugando con minimalismo y paletas de colores específicas",
+      scale: 2.15
     },
     {
       archivos: ["MAUL1.png"],
-      titulo: "Darth Maul — Sith Edition I",
-      descripcion: "Estudio de personaje en alto contraste con el sable doble y grafismo rítmico. Contraste violento entre negro puro y carmesí Sith."
+      titulo: "Darth Maul - Ver.1",
+      descripcion: "Villano que amo de Star Wars, mi personaje favorito incluso. Contrastes y juego de texturas en los textos."
     },
     {
       archivos: ["MAUL2.png"],
-      titulo: "Darth Maul — Sith Edition II",
-      descripcion: "Segunda variación gráfica de Darth Maul con énfasis en la tipografía gestual y textura de alto impacto."
+      titulo: "Darth Maul - Ver.2",
+      descripcion: "Villano que amo de Star Wars, mi personaje favorito incluso. Contrastes y juego de texturas en los textos. Ilustraciones sacadas de sus propios comics."
     },
     {
       archivos: ["neuropibada.jpg"],
-      titulo: "Neuropibada — Gráfica Experimental",
-      descripcion: "Exploración de textura digital degradada, glitch y colisiones visuales de baja fidelidad para convocatoria cultural alternativa."
+      titulo: "Desde el Respeto - Neuropibes",
+      descripcion: "Flyer que hice con cariño para un gran programa de streaming en Vorterix, Desde El Respeto."
     },
     {
       archivos: ["Mesa de trabajo 1.png"],
-      titulo: "Mesa de Trabajo — Edición I",
-      descripcion: "Composición de afiche experimental con estructuración asimétrica y tipografía condensada contemporánea."
+      titulo: "Senna",
+      descripcion: "Flyer hecho despues de ver el documental de Senna"
     },
     {
       archivos: ["Mesa de trabajo1.png"],
-      titulo: "Mesa de Trabajo — Edición II",
-      descripcion: "Exploración visual complementaria con balance de pesos tipográficos y texturas monocromáticas."
+      titulo: "La Virgen de la Tosquera",
+      descripcion: "Flyer que hice para participar del concurso de Diseños para la película La Virgen de la Tosquera, basado en el cuento de Mariana Enriquez"
     },
     {
       archivos: ["arg (pdf.io).jpg"],
-      titulo: "AFA — Selección Argentina",
-      descripcion: "Homenaje tipográfico y afiche conmemorativo de alto impacto para la Selección Argentina. Fotografía documental intervenida con texturas analógicas y tipografía condensada."
+      titulo: "Argentina - Inglaterra",
+      descripcion: "Homenaje al partido del Mundial 2026 de Argentina contra Inglaterra, emocionante partido. De mis flyers favoritos"
     },
     {
       archivos: ["badbunny concierto.jpg"],
-      titulo: "Bad Bunny — En Concierto",
-      descripcion: "Afiche promocional de recital masivo. Composición contemporánea con contrastes cromáticos saturados, síntesis tipográfica y estética urbana underground."
+      titulo: "Bad Bunny - Dtmf Tour",
+      descripcion: "Flyer que hice con fotos propias tomadas en el increíble recital de Bad Bunny en el Monumental."
     },
+    // --- SERIE AGRUPADA 3: Exploración Visual (Colección rotatoria de 3 piezas) ---
     {
-      archivos: ["Mesa de trabajo 1.jpg"],
-      titulo: "Exploración Visual — Serie Gráfica I",
-      descripcion: "Composición experimental en gran escala. Exploración de diagramación asimétrica, jerarquías dinámicas y texturas visuales contemporáneas."
-    },
-    {
-      archivos: ["Mesa de trabajo 1 copia 2.jpg"],
-      titulo: "Exploración Visual — Serie Gráfica II",
-      descripcion: "Variación compositiva con modulación tipográfica experimental, contraste tonal acentuado y balance de pesos visuales."
-    },
-    {
-      archivos: ["Mesa de trabajo 1 copia 3.jpg"],
-      titulo: "Exploración Visual — Serie Gráfica III",
-      descripcion: "Lámina gráfica de estudio formal con interacción de figuras geométricas, paleta monocromática y contrapuntos visuales dinámicos."
+      archivos: [
+        "Mesa de trabajo 1.jpg",
+        "Mesa de trabajo 1 copia 2.jpg",
+        "Mesa de trabajo 1 copia 3.jpg"
+      ],
+      intervalo: 3000,
+      titulo: "Gracias Eternas",
+      descripcion: "Serie de Flyers realizada en conmemoración del subcampeonato obtenido por la Selección Argentina en el Mundial 2026.",
+      fit: "contain",
+      bg: "#FDFCF8"
     }
   ];
   /* ========================================================================== */
@@ -162,6 +182,11 @@
    * -------------------------------------------------------------------------- */
   const initLoadAnimation = () => {
     const triggerLoaded = () => {
+      const userAgeEl = document.getElementById('userAge');
+      if (userAgeEl) {
+        userAgeEl.textContent = calcularEdad().toString();
+      }
+
       setTimeout(() => {
         document.body.classList.add('loaded');
       }, 80);
@@ -413,13 +438,33 @@
     }
 
     bindEvents() {
+      const descPanel = document.getElementById('categoryDescPanel');
+
       // 1. Navegación por rueda del ratón / trackpad (wheel)
       window.addEventListener('wheel', (e) => {
         if (this.isThrottled) return;
 
-        // Si el usuario está scrolleando dentro del feed de flyers, permitir navegación libre en la cinta infinita
+        // Zona activa de Flyers: en Frame 2 y categoría "flyers", toda la zona derecha
+        // de la pantalla (feed de flyers + panel de descripción blanco) scrollea la cinta continua de flyers.
         const flyersFeed = document.getElementById('flyersScrollContainer');
-        if (this.currentFrame === 2 && this.categoriesController?.activeCategory === 'flyers' && flyersFeed && (flyersFeed.contains(e.target) || e.target.closest('#panel-flyers'))) {
+        const isRightZone = (
+          (flyersFeed && (flyersFeed.contains(e.target) || e.target.closest('#panel-flyers'))) ||
+          (descPanel && descPanel.contains(e.target)) ||
+          e.clientX >= window.innerWidth * 0.22
+        );
+
+        if (this.currentFrame === 2 && this.categoriesController?.activeCategory === 'flyers' && isRightZone) {
+          // Si el scroll ocurrió fuera del contenedor nativo de flyers (ej. en el panel de texto blanco a la derecha),
+          // redirigir el desplazamiento directamente al feed de flyers
+          if (flyersFeed && !flyersFeed.contains(e.target)) {
+            let dy = e.deltaY;
+            if (e.deltaMode === 1) { // Modo líneas (Firefox / Windows)
+              dy *= 32;
+            } else if (e.deltaMode === 2) { // Modo páginas
+              dy *= window.innerHeight;
+            }
+            flyersFeed.scrollTop += dy;
+          }
           return; // Permitir que la cinta de flyers scrollee libremente sin interferir con el cambio de categorías
         }
 
@@ -451,9 +496,40 @@
         }
       }, { passive: true });
 
-      // 2. Navegación táctil (swipe) para smartphones y tablets
+      // 2. Soporte táctil en panel lateral derecho para scrollear flyers
+      if (descPanel) {
+        let panelTouchY = null;
+        descPanel.addEventListener('touchstart', (e) => {
+          if (e.touches.length > 0) {
+            panelTouchY = e.touches[0].clientY;
+          }
+        }, { passive: true });
+
+        descPanel.addEventListener('touchmove', (e) => {
+          if (this.categoriesController?.activeCategory === 'flyers' && e.touches.length > 0 && panelTouchY !== null) {
+            const currentY = e.touches[0].clientY;
+            const deltaY = panelTouchY - currentY;
+            panelTouchY = currentY;
+            const flyersFeed = document.getElementById('flyersScrollContainer');
+            if (flyersFeed) {
+              flyersFeed.scrollTop += deltaY;
+            }
+          }
+        }, { passive: true });
+
+        descPanel.addEventListener('touchend', () => {
+          panelTouchY = null;
+        }, { passive: true });
+        descPanel.addEventListener('touchcancel', () => {
+          panelTouchY = null;
+        }, { passive: true });
+      }
+
+      // 3. Navegación táctil global (swipe) para smartphones y tablets
+      let touchStartX = 0;
       window.addEventListener('touchstart', (e) => {
         if (e.touches.length > 0) {
+          touchStartX = e.touches[0].clientX;
           this.touchStartY = e.touches[0].clientY;
         }
       }, { passive: true });
@@ -461,8 +537,21 @@
       window.addEventListener('touchend', (e) => {
         if (this.isThrottled || e.changedTouches.length === 0) return;
 
+        const touchEndX = e.changedTouches[0].clientX;
         const touchEndY = e.changedTouches[0].clientY;
         const deltaY = this.touchStartY - touchEndY;
+
+        const flyersFeed = document.getElementById('flyersScrollContainer');
+        const isRightZone = (
+          (flyersFeed && (flyersFeed.contains(e.target) || e.target.closest('#panel-flyers'))) ||
+          (descPanel && descPanel.contains(e.target)) ||
+          touchStartX >= window.innerWidth * 0.22 ||
+          touchEndX >= window.innerWidth * 0.22
+        );
+
+        if (this.currentFrame === 2 && this.categoriesController?.activeCategory === 'flyers' && isRightZone) {
+          return;
+        }
 
         // Swipe arriba (desplazar hacia abajo / avanzar)
         if (deltaY > 50) {
@@ -558,14 +647,22 @@
   /* --------------------------------------------------------------------------
    * 5. DATOS Y CONTROLADOR DEL MENÚ DE CATEGORÍAS & PANEL DE DESCRIPCIÓN
    * -------------------------------------------------------------------------- */
+  const getTextoSobreMi = () => {
+    const edad = calcularEdad();
+    return `
+      <p>Holaaa, me dicen Tabbi, tengo <span id="userAge">${edad}</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.</p>
+      <p>Me concidero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola area, siento que siempre hay algo innovador para hacer.</p>
+    `;
+  };
+
   const CATEGORY_DATA = {
     'sobre-mi': {
-      title: 'Sobre mi',
-      desc: 'Diseñador multimedial enfocado en la convergencia entre diseño visual, código creativo e interacción. Exploración constante de nuevas estéticas y experiencias digitales.'
+      title: 'Agustin Tabbita',
+      desc: getTextoSobreMi
     },
     'flyers': {
       title: '', // Sin título en el estado introductorio
-      desc: TEXTO_INTRO_FLYERS
+      desc: ''
     },
     'multimediales': {
       title: 'Multimediales',
@@ -664,7 +761,7 @@
 
     /**
      * Muestra el texto introductorio de Flyers en el panel derecho:
-     * Sin título y sin línea divisoria (solo el párrafo descriptivo)
+     * Sin título y sin línea divisoria (solo los párrafos descriptivos y el botón de Instagram)
      */
     showFlyersIntro() {
       if (this.panelTextContainer) {
@@ -679,7 +776,20 @@
           this.panelLine.classList.add('is-hidden');
         }
         if (this.panelDesc) {
-          this.panelDesc.textContent = TEXTO_INTRO_FLYERS;
+          this.panelDesc.innerHTML = `
+            <p>${TEXTO_INTRO_FLYERS}</p>
+            <p>${TEXTO_INSTAGRAM_FLYERS}</p>
+            <a href="${URL_INSTAGRAM}" target="_blank" rel="noopener noreferrer" class="panel-btn-instagram" aria-label="Ver cuenta de Instagram">
+              <svg class="btn-ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              <span>Ver en Instagram</span>
+              <svg class="btn-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </a>
+          `;
         }
         if (this.panelTextContainer) {
           this.panelTextContainer.classList.remove('is-changing');
@@ -703,7 +813,7 @@
           this.panelLine.classList.remove('is-hidden');
         }
         if (this.panelDesc) {
-          this.panelDesc.textContent = flyer.descripcion;
+          this.panelDesc.innerHTML = `<p>${flyer.descripcion}</p>`;
         }
         if (this.panelTextContainer) {
           this.panelTextContainer.classList.remove('is-changing');
@@ -729,7 +839,14 @@
       if (!data) return;
 
       if (this.panelTitle) this.panelTitle.textContent = data.title;
-      if (this.panelDesc) this.panelDesc.textContent = data.desc;
+      if (this.panelDesc) {
+        const content = typeof data.desc === 'function' ? data.desc() : data.desc;
+        if (typeof content === 'string' && content.includes('<')) {
+          this.panelDesc.innerHTML = content;
+        } else {
+          this.panelDesc.textContent = content;
+        }
+      }
     }
 
     /**
@@ -898,6 +1015,7 @@
       this.grid = document.getElementById('flyersColumnsGrid');
       this.col1 = document.getElementById('flyersCol1');
       this.col2 = document.getElementById('flyersCol2');
+      this.col3 = document.getElementById('flyersCol3');
 
       this.cards = [];
       this.intervals = [];
@@ -905,9 +1023,9 @@
       this.selectedFlyerIndex = null;
       this.selectedCard = null;
 
-      // Parámetros de la cinta de empaque (auto-scroll más rápido y continuo)
+      // Parámetros de la cinta de empaque (auto-scroll continuo)
       this.isAutoScrolling = false;
-      this.autoScrollSpeed = (typeof VELOCIDAD_CINTA_FLYERS !== 'undefined') ? VELOCIDAD_CINTA_FLYERS : 68;
+      this.autoScrollSpeed = (typeof VELOCIDAD_CINTA_FLYERS !== 'undefined') ? VELOCIDAD_CINTA_FLYERS : 95;
       this.accumulatedScroll = 0;
       this.lastFrameTime = 0;
       this.rafId = null;
@@ -917,8 +1035,10 @@
 
       this.col1Batch1 = null;
       this.col2Batch1 = null;
+      this.col3Batch1 = null;
       this.col1Batch2 = null;
       this.col2Batch2 = null;
+      this.col3Batch2 = null;
 
       this.init();
     }
@@ -930,10 +1050,10 @@
 
     /**
      * Baraja aleatoriamente los flyers y crea dos lotes idénticos en cada columna
-     * para lograr un bucle infinito matemáticamente continuo ("cinta de empaque")
+     * para lograr un bucle infinito matemáticamente continuo ("cinta de empaque") en 3 columnas
      */
     shuffleAndRender() {
-      if (!this.col1 || !this.col2) return;
+      if (!this.col1 || !this.col2 || !this.col3) return;
 
       this.stopAutoScroll();
       this.stopRotations();
@@ -942,6 +1062,7 @@
 
       this.col1.innerHTML = '';
       this.col2.innerHTML = '';
+      this.col3.innerHTML = '';
       this.cards = [];
 
       // 1. Barajar aleatoriamente la lista de flyers (Fisher-Yates Shuffle)
@@ -952,7 +1073,7 @@
       }
       this.shuffledList = list;
 
-      // 2. Crear contenedores de lotes (Batch 1 y Batch 2 para el loop infinito)
+      // 2. Crear contenedores de lotes (Batch 1 y Batch 2 para el loop infinito en 3 columnas)
       this.col1Batch1 = document.createElement('div');
       this.col1Batch1.className = 'flyers-batch flyers-batch-1';
       this.col1Batch2 = document.createElement('div');
@@ -963,27 +1084,36 @@
       this.col2Batch2 = document.createElement('div');
       this.col2Batch2.className = 'flyers-batch flyers-batch-2';
 
-      // 3. Distribuir de forma alternada (par a Columna 1, impar a Columna 2)
+      this.col3Batch1 = document.createElement('div');
+      this.col3Batch1.className = 'flyers-batch flyers-batch-1';
+      this.col3Batch2 = document.createElement('div');
+      this.col3Batch2.className = 'flyers-batch flyers-batch-2';
+
+      // 3. Distribuir de forma alternada en 3 columnas
       // Lote 1 (Principal):
       list.forEach((item, index) => {
-        const isCol2 = (index % 2 !== 0);
+        const colMod = index % 3;
         const cardObj = this.createCardElement(item, index, false);
-        if (isCol2) {
+        if (colMod === 0) {
+          this.col1Batch1.appendChild(cardObj.card);
+        } else if (colMod === 1) {
           this.col2Batch1.appendChild(cardObj.card);
         } else {
-          this.col1Batch1.appendChild(cardObj.card);
+          this.col3Batch1.appendChild(cardObj.card);
         }
         this.cards.push(cardObj);
       });
 
       // Lote 2 (Duplicado exacto para bucle infinito sin salto visual):
       list.forEach((item, index) => {
-        const isCol2 = (index % 2 !== 0);
+        const colMod = index % 3;
         const cloneObj = this.createCardElement(item, index, true);
-        if (isCol2) {
+        if (colMod === 0) {
+          this.col1Batch2.appendChild(cloneObj.card);
+        } else if (colMod === 1) {
           this.col2Batch2.appendChild(cloneObj.card);
         } else {
-          this.col1Batch2.appendChild(cloneObj.card);
+          this.col3Batch2.appendChild(cloneObj.card);
         }
         this.cards.push(cloneObj);
       });
@@ -992,6 +1122,8 @@
       this.col1.appendChild(this.col1Batch2);
       this.col2.appendChild(this.col2Batch1);
       this.col2.appendChild(this.col2Batch2);
+      this.col3.appendChild(this.col3Batch1);
+      this.col3.appendChild(this.col3Batch2);
 
       this.equalizeBatchHeights();
     }
@@ -1008,6 +1140,17 @@
       const mediaWrap = document.createElement('div');
       mediaWrap.className = 'flyer-media-wrap';
 
+      if (item.bg) {
+        mediaWrap.style.backgroundColor = item.bg;
+        card.style.backgroundColor = item.bg;
+      }
+      if (item.fit) {
+        card.classList.add(`is-fit-${item.fit}`);
+      }
+      if (item.scale) {
+        card.style.setProperty('--card-selected-scale', item.scale);
+      }
+
       const basePath = CARPETA_FLYERS.endsWith('/') ? CARPETA_FLYERS : `${CARPETA_FLYERS}/`;
       const firstFile = item.archivos[0];
       const baseImg = document.createElement('img');
@@ -1020,6 +1163,7 @@
 
       const rotatingLayers = [];
       if (item.archivos.length > 1) {
+        card.classList.add('has-series');
         item.archivos.forEach((file, fileIdx) => {
           const layerImg = document.createElement('img');
           layerImg.className = `flyer-img-layer ${fileIdx === 0 ? 'is-active' : ''}`;
@@ -1066,32 +1210,37 @@
         isClone,
         rotatingLayers,
         currentFileIdx: 0,
-        intervalMs: item.intervalo || 1800
+        intervalMs: item.intervalo || 3000
       };
     }
 
     /**
-     * Sincroniza las alturas de los lotes entre ambas columnas para que
+     * Sincroniza las alturas de los lotes entre las 3 columnas para que
      * la cinta de empaque repita su ciclo en el píxel exacto sin saltos.
      */
     equalizeBatchHeights() {
-      if (!this.col1Batch1 || !this.col2Batch1) return;
+      if (!this.col1Batch1 || !this.col2Batch1 || !this.col3Batch1) return;
 
       this.col1Batch1.style.minHeight = '0px';
       this.col2Batch1.style.minHeight = '0px';
+      this.col3Batch1.style.minHeight = '0px';
       if (this.col1Batch2) this.col1Batch2.style.minHeight = '0px';
       if (this.col2Batch2) this.col2Batch2.style.minHeight = '0px';
+      if (this.col3Batch2) this.col3Batch2.style.minHeight = '0px';
 
       const h1 = this.col1Batch1.offsetHeight;
       const h2 = this.col2Batch1.offsetHeight;
-      const maxH = Math.max(h1, h2);
+      const h3 = this.col3Batch1.offsetHeight;
+      const maxH = Math.max(h1, h2, h3);
 
       if (maxH > 100) {
         this.batchHeight = maxH;
         this.col1Batch1.style.minHeight = `${maxH}px`;
         this.col2Batch1.style.minHeight = `${maxH}px`;
+        this.col3Batch1.style.minHeight = `${maxH}px`;
         if (this.col1Batch2) this.col1Batch2.style.minHeight = `${maxH}px`;
         if (this.col2Batch2) this.col2Batch2.style.minHeight = `${maxH}px`;
+        if (this.col3Batch2) this.col3Batch2.style.minHeight = `${maxH}px`;
       }
     }
 
@@ -1126,6 +1275,19 @@
       window.addEventListener('resize', () => {
         this.equalizeBatchHeights();
       });
+
+      // 5. Garantizar envoltura instantánea del bucle continuo al scrollear manualmente
+      if (this.scrollContainer) {
+        this.scrollContainer.addEventListener('scroll', () => {
+          if (this.batchHeight > 200) {
+            if (this.scrollContainer.scrollTop >= this.batchHeight) {
+              this.scrollContainer.scrollTop -= this.batchHeight;
+            } else if (this.scrollContainer.scrollTop < 0) {
+              this.scrollContainer.scrollTop += this.batchHeight;
+            }
+          }
+        }, { passive: true });
+      }
     }
 
     /**
@@ -1198,14 +1360,19 @@
 
       // 2. Activar clase en la grilla y jerarquía de z-index entre columnas
       const isCol1 = Boolean(cardEl.closest('.flyers-col-1'));
+      const isCol2 = Boolean(cardEl.closest('.flyers-col-2'));
+      const isCol3 = Boolean(cardEl.closest('.flyers-col-3'));
+
       if (this.grid) {
         this.grid.classList.add('has-selected');
         this.grid.classList.toggle('has-selected-col1', isCol1);
-        this.grid.classList.toggle('has-selected-col2', !isCol1);
+        this.grid.classList.toggle('has-selected-col2', isCol2);
+        this.grid.classList.toggle('has-selected-col3', isCol3);
       }
-      if (this.col1 && this.col2) {
+      if (this.col1 && this.col2 && this.col3) {
         this.col1.style.zIndex = isCol1 ? '60' : '1';
-        this.col2.style.zIndex = isCol1 ? '1' : '60';
+        this.col2.style.zIndex = isCol2 ? '60' : '1';
+        this.col3.style.zIndex = isCol3 ? '60' : '1';
       }
 
       // 3. Actualizar estado visual y escala en las tarjetas
@@ -1261,11 +1428,12 @@
 
       // Quitar clases de enfoque en la grilla y restablecer z-index de columnas
       if (this.grid) {
-        this.grid.classList.remove('has-selected', 'has-selected-col1', 'has-selected-col2');
+        this.grid.classList.remove('has-selected', 'has-selected-col1', 'has-selected-col2', 'has-selected-col3');
       }
-      if (this.col1 && this.col2) {
+      if (this.col1 && this.col2 && this.col3) {
         this.col1.style.zIndex = '';
         this.col2.style.zIndex = '';
+        this.col3.style.zIndex = '';
       }
 
       this.cards.forEach(c => c.card.classList.remove('is-selected'));
@@ -1299,7 +1467,7 @@
       });
 
       groups.forEach((groupCards, item) => {
-        const intervalMs = item.intervalo || 1800;
+        const intervalMs = item.intervalo || 3000;
         let currentIdx = 0;
         const total = item.archivos.length;
 
