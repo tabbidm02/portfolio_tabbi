@@ -47,11 +47,20 @@
 
   /* Panel Lateral Derecho (Descripción) */
   --panel-delay: 0.6s;           /* Delay configurable antes de que aparezca el panel */
-  --panel-width: 20vw;           /* Más angosto y tirado a la derecha (~384px en 1920x1080) */
+  --panel-width: 20vw;           /* Ancho estándar para categorías generales (~384px en FHD) */
+  --panel-max-width: 420px;
+  --panel-width-sobre-mi: clamp(420px, 30vw, 620px); /* Ancho exclusivo y amplio para 'Sobre mí' */
+  --panel-max-width-sobre-mi: 620px;
   --panel-color: #FFFEF6;        /* Crema claro del rectángulo */
 
   /* Escala de flyer al ser seleccionado */
   --flyer-selected-scale: 1.76;
+}
+
+/* Ancho expandido exclusivamente para la categoría "Sobre mí" */
+body[data-category="sobre-mi"] {
+  --panel-width: var(--panel-width-sobre-mi);
+  --panel-max-width: var(--panel-max-width-sobre-mi);
 }
 
 *, *::before, *::after {
@@ -464,7 +473,8 @@ body[data-frame="2"] .category-active-line {
 .category-display {
   position: absolute;
   left: 23vw;
-  width: 54vw;
+  right: calc(var(--panel-width) + 2.5vw);
+  width: auto;
   top: 0;
   bottom: 0;
   z-index: 10;
@@ -476,7 +486,16 @@ body[data-frame="2"] .category-active-line {
   justify-content: center;
   transition: 
     opacity 0.4s ease,
-    transform 0.5s var(--ease-out-expo);
+    transform 0.5s var(--ease-out-expo),
+    right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Área de visualización expandida exclusivamente para Sobre Mí */
+body[data-category="sobre-mi"] .category-display {
+  left: clamp(140px, 11vw, 200px);
+  right: calc(var(--panel-width) + 1.2vw);
+  top: 0;
+  bottom: 0;
 }
 
 body[data-frame="2"] .category-display {
@@ -506,6 +525,73 @@ body[data-frame="2"] .category-display {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+}
+
+/* ==========================================================================
+   PANEL "SOBRE MÍ": TIRADA DE POLAROIDS SOBRE LA MESA
+   ========================================================================== */
+
+#panel-sobre-mi {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Stage: ocupa todo el panel central y actúa como "mesa" amplia */
+.polaroids-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+/* Polaroid individual */
+.polaroid-item {
+  position: absolute;
+  width: clamp(245px, 21vw, 350px);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+  will-change: transform;
+  /* Estado inicial: oculto sobre la pantalla (sin escala ni zoom) */
+  opacity: 0;
+  transform: translateY(-125vh);
+  transition:
+    opacity 0.15s ease,
+    filter 0.3s ease;
+}
+
+/* Estado "sobre la mesa": polaroid aterrizada en su posición */
+.polaroid-item.is-landed {
+  opacity: 1;
+}
+
+/* Hover: resalta la sombra sin hacer zoom ni cambio de escala */
+.polaroid-item:not(.is-dragging):hover {
+  filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.72));
+}
+
+/* Estado arrastrado */
+.polaroid-item.is-dragging {
+  cursor: grabbing !important;
+  filter: drop-shadow(0 26px 48px rgba(0, 0, 0, 0.8));
+  z-index: 9999 !important;
+}
+
+/* La imagen SVG dentro de la polaroid ocupa todo el ancho */
+.polaroid-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* ==========================================================================
@@ -921,7 +1007,7 @@ body:not(.panel-open) .hero-logo-dark {
   right: 0;
   bottom: 0;
   width: var(--panel-width, 20vw);
-  max-width: 420px;
+  max-width: var(--panel-max-width, 420px);
   height: 100vh;
   height: 100dvh;
   z-index: 20;
@@ -931,7 +1017,10 @@ body:not(.panel-open) .hero-logo-dark {
   pointer-events: none;
   overflow: hidden;
   box-shadow: -10px 0 35px rgba(0, 0, 0, 0.2);
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--panel-delay, 0.6s);
+  transition: 
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--panel-delay, 0.6s),
+    width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
   cursor: default;
 }
@@ -987,11 +1076,32 @@ body.panel-open .description-panel {
   flex-direction: column;
   justify-content: flex-start;
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(33, 33, 33, 0.2) transparent;
+}
+
+.panel-content-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-content-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-content-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(33, 33, 33, 0.2);
+  border-radius: 4px;
+}
+
+.panel-content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(33, 33, 33, 0.4);
 }
 
 .panel-text-container,
 .description-text-inner {
-  padding: clamp(3rem, 4.5vh, 4rem) clamp(1.6rem, 2vw, 2.4rem);
+  padding: clamp(3rem, 4.5vh, 4rem) clamp(2rem, 2.4vw, 3rem) clamp(5rem, 12vh, 8rem) clamp(2rem, 2.4vw, 3rem);
   color: #212121;
   font-family: 'Montserrat', sans-serif;
   display: flex;
@@ -1144,12 +1254,23 @@ body.panel-open .description-panel {
     --font-size-cat-active: 30px;
     --font-size-cat-inactive: 20px;
     --panel-width: 25vw;
+    --panel-max-width: 420px;
+    --panel-width-sobre-mi: clamp(340px, 34vw, 460px);
+    --panel-max-width-sobre-mi: 460px;
     --flyer-selected-scale: 1.55;
   }
 
   .category-display {
-    left: 28vw;
-    width: 44vw;
+    left: 26vw;
+    right: calc(var(--panel-width) + 2vw);
+    width: auto;
+  }
+
+  body[data-category="sobre-mi"] .category-display {
+    left: clamp(120px, 13vw, 170px);
+    right: calc(var(--panel-width) + 1vw);
+    top: 0;
+    bottom: 0;
   }
 
   .flyers-col-2 {
@@ -1203,6 +1324,14 @@ body.panel-open .description-panel {
     bottom: 8vh;
   }
 
+  body[data-category="sobre-mi"] .category-display {
+    left: clamp(90px, 16vw, 140px);
+    right: 2vw;
+    top: 1.5vh;
+    bottom: 1.5vh;
+  }
+
+  .category-desc-panel,
   .description-panel {
     display: none;
   }

@@ -22,7 +22,7 @@
 
   // Configuración de Instagram y segundo párrafo para Flyers:
   const URL_INSTAGRAM = "https://www.instagram.com/tabbidm02"; // Modificar con tu usuario de Instagram si es diferente
-  const TEXTO_INSTAGRAM_FLYERS = "Todos estos diseños y muchos máslos comparto en mi cuenta de Instagram";
+  const TEXTO_INSTAGRAM_FLYERS = "Todos estos diseños y muchos más los comparto en mi cuenta de Instagram";
 
   // Fecha de nacimiento para cálculo dinámico de edad (2 de julio de 2002):
   // Se actualiza automáticamente cada 2 de julio de cada año.
@@ -332,39 +332,47 @@
   class ContinuousInkAnimation {
     constructor() {
       this.turbulence = document.getElementById('inkTurbulence');
+      this.displace   = document.getElementById('inkDisplace');
       if (!this.turbulence) return;
 
-      this.seed = 1;
-      this.intervalId = null;
+      // ── Parámetros ajustables ──────────────────────────────────────────────
+      // Frecuencia del ruido fractal (cuánto "riza" la tinta en X e Y)
+      this.FREQ_X            = 0.040;
+      this.FREQ_Y            = 0.018;
+      // Intensidad del displacement (cuánto "mueve" la tinta)
+      this.SCALE             = 7;
+      // Cada cuántos ms salta el seed (varía el patrón fractal)
+      this.INTERVALO_SEED    = 85;
+      // ──────────────────────────────────────────────────────────────────────
+
+      this.seed      = 1;
+      this.seedTimer = null;
+
       this.init();
     }
 
     init() {
-      this.start();
+      // Aplicar valores fijos al iniciar
+      this.turbulence.setAttribute('baseFrequency', `${this.FREQ_X} ${this.FREQ_Y}`);
+      if (this.displace) this.displace.setAttribute('scale', this.SCALE);
 
+      this.start();
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          this.stop();
-        } else {
-          this.start();
-        }
+        if (document.hidden) { this.stop(); } else { this.start(); }
       });
     }
 
     start() {
-      if (this.intervalId) return;
-
-      this.intervalId = setInterval(() => {
-        this.seed = (this.seed % 8) + 1;
+      if (this.seedTimer) return;
+      // Solo el seed cambia: varía el patrón sin animar la intensidad
+      this.seedTimer = setInterval(() => {
+        this.seed = (this.seed % 12) + 1;
         this.turbulence.setAttribute('seed', this.seed.toString());
-      }, 120);
+      }, this.INTERVALO_SEED);
     }
 
     stop() {
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-        this.intervalId = null;
-      }
+      if (this.seedTimer) { clearInterval(this.seedTimer); this.seedTimer = null; }
     }
   }
 
@@ -393,6 +401,9 @@
 
       this.currentFrame = frameNumber;
       document.body.setAttribute('data-frame', frameNumber.toString());
+
+      // Emitir evento personalizado para que PolaroidsManager y otros módulos escuchen el cambio
+      document.dispatchEvent(new CustomEvent('framechange', { detail: { frame: frameNumber } }));
 
       const categoriesNav = document.getElementById('categoriesNav');
 
@@ -651,7 +662,7 @@
     const edad = calcularEdad();
     return `
       <p>Holaaa, me dicen Tabbi, tengo <span id="userAge">${edad}</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.</p>
-      <p>Me concidero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola area, siento que siempre hay algo innovador para hacer.</p>
+      <p>Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola área, siento que siempre hay algo innovador para hacer.</p>
     `;
   };
 
@@ -720,6 +731,7 @@
     init() {
       this.bindCategoryClicks();
       this.bindResize();
+      document.body.setAttribute('data-category', 'sobre-mi');
       // Inicializar posición de la línea indicadora
       this.updateActiveLine(false);
       // Inicializar texto de la categoría inicial
@@ -921,6 +933,7 @@
       }
 
       this.activeCategory = categoryName;
+      document.body.setAttribute('data-category', categoryName);
 
       // 1. Instante 0s: Actualizar estados de botones inmediatamente
       this.items.forEach((btn) => {
@@ -1528,9 +1541,390 @@
   }
 
   /* --------------------------------------------------------------------------
-   * 7. BOOTSTRAP DE LA APLICACIÓN
+   * 6b. POLAROIDS MANAGER (Categoría "Sobre mí")
+   * Tirada de polaroids con despeje físico sobre la mesa (sin efecto zoom)
    * -------------------------------------------------------------------------- */
-  const init = () => {
+  class PolaroidsManager {
+    constructor() {
+      this.stage = document.getElementById('polaroidsStage');
+      // Archivos detectados automáticamente del directorio svg/
+      this.files = [
+        'svg/Group 21.svg',
+        'svg/Group 22.svg',
+        'svg/Group 23.svg',
+        'svg/Group 24.svg',
+        'svg/Group 25.svg',
+        'svg/Capa 233.svg'
+      ];
+      this.items = [];
+      this.topZIndex = 10;
+      this.isAnimating = false;
+      this.throwTimers = [];
+
+      if (!this.stage) return;
+      this._build();
+      this._bindCategoryChange();
+      this._bindResize();
+    }
+
+    /* --- Construir los elementos polaroid en el DOM --- */
+    _build() {
+      this.stage.innerHTML = '';
+      this.items = [];
+
+      this.files.forEach((src, i) => {
+        const el = document.createElement('div');
+        el.className = 'polaroid-item';
+        el.setAttribute('aria-label', `Polaroid ${i + 1}`);
+        el.style.zIndex = i + 1;
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.draggable = false;
+        el.appendChild(img);
+
+        // Estado inicial arriba fuera de pantalla (sin escala ni zoom)
+        el.style.left = '0px';
+        el.style.top = '0px';
+        el.style.transform = `translate(0px, 0px) rotate(0deg) translateY(-125vh)`;
+        el.style.opacity = '0';
+
+        this.stage.appendChild(el);
+        this.items.push(el);
+
+        this._bindDrag(el, i);
+        this._bindCardHover(el, i);
+      });
+
+      this._applyLayouts();
+    }
+
+    /* --- Calcular posiciones orgánicas sobre la mesa --- */
+    _calculateLayouts() {
+      const stageRect = this.stage.getBoundingClientRect();
+      const stageW = stageRect.width || this.stage.offsetWidth || (window.innerWidth * 0.55);
+      const stageH = stageRect.height || this.stage.offsetHeight || window.innerHeight;
+
+      const sample = this.items[0];
+      const cardW = (sample && sample.offsetWidth > 40)
+        ? sample.offsetWidth
+        : Math.min(350, Math.max(245, stageW * 0.22));
+      const cardH = cardW * 1.3913; // proporción 989:1376 de los SVGs
+
+      // Margen de seguridad estricto para no tocar los bordes de la pantalla
+      const padX = 18;
+      const padY = 22;
+      const minX = padX;
+      const maxX = Math.max(minX, stageW - cardW - padX);
+      const minY = padY;
+      const maxY = Math.max(minY, stageH - cardH - padY);
+
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const spreadX = (maxX - minX) * 0.38;
+      const spreadY = (maxY - minY) * 0.36;
+
+      // 6 posiciones armónicas para que aterricen como fotos arrojadas en una mesa
+      const baseConfig = [
+        { ox: -0.42, oy: -0.40, rot: -7.5 },  // 1. Arriba izq
+        { ox:  0.38, oy: -0.38, rot:  8.0 },  // 2. Arriba der
+        { ox: -0.14, oy: -0.04, rot: -3.5 },  // 3. Centro izq
+        { ox:  0.22, oy:  0.08, rot:  6.5 },  // 4. Centro der
+        { ox: -0.36, oy:  0.38, rot: -5.5 },  // 5. Abajo izq
+        { ox:  0.16, oy:  0.34, rot:  4.0 }   // 6. Abajo der
+      ];
+
+      const layouts = [];
+      const count = this.items.length;
+
+      for (let i = 0; i < count; i++) {
+        const c = baseConfig[i % baseConfig.length];
+        const rawX = cx + c.ox * spreadX;
+        const rawY = cy + c.oy * spreadY;
+
+        const x = Math.max(minX, Math.min(maxX, Math.round(rawX)));
+        const y = Math.max(minY, Math.min(maxY, Math.round(rawY)));
+        const rot = c.rot;
+
+        layouts.push({ x, y, rot, minX, maxX, minY, maxY });
+      }
+
+      return layouts;
+    }
+
+    _applyLayouts() {
+      const layouts = this._calculateLayouts();
+      this.items.forEach((el, i) => {
+        const l = layouts[i];
+        el.dataset.posX = l.x;
+        el.dataset.posY = l.y;
+        el.dataset.rot = l.rot;
+        el.dataset.minX = l.minX;
+        el.dataset.maxX = l.maxX;
+        el.dataset.minY = l.minY;
+        el.dataset.maxY = l.maxY;
+      });
+    }
+
+    /* --- Lanzar la tirada desde arriba hacia la posición de la mesa --- */
+    throw() {
+      if (this.isAnimating) return;
+      this.isAnimating = true;
+
+      // Medir y calcular layouts con dimensiones exactas
+      this._applyLayouts();
+
+      // Resetear arriba (sin animación, sin escala)
+      this.items.forEach(el => {
+        const posX = parseFloat(el.dataset.posX);
+        const posY = parseFloat(el.dataset.posY);
+        const rot = parseFloat(el.dataset.rot);
+
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        el.style.transform = `translate(${posX}px, ${posY}px) rotate(${rot}deg) translateY(-125vh)`;
+        el.classList.remove('is-landed', 'is-dragging');
+      });
+
+      // Limpiar timers anteriores
+      this.throwTimers.forEach(t => clearTimeout(t));
+      this.throwTimers = [];
+
+      // Stagger de caída: caen en la mesa
+      this.items.forEach((el, i) => {
+        const t = setTimeout(() => {
+          const posX = parseFloat(el.dataset.posX);
+          const posY = parseFloat(el.dataset.posY);
+          const rot = parseFloat(el.dataset.rot);
+
+          // Transición de aterrizaje físico (sin zoom/escala)
+          el.style.transition = 'transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease';
+          el.style.opacity = '1';
+          el.style.transform = `translate(${posX}px, ${posY}px) rotate(${rot}deg)`;
+          el.classList.add('is-landed');
+
+          if (i === this.items.length - 1) {
+            setTimeout(() => { this.isAnimating = false; }, 900);
+          }
+        }, i * 120);
+        this.throwTimers.push(t);
+      });
+    }
+
+    /* --- Resetear al estado inicial (fuera de pantalla arriba) --- */
+    reset() {
+      this.throwTimers.forEach(t => clearTimeout(t));
+      this.throwTimers = [];
+      this.isAnimating = false;
+
+      this.items.forEach(el => {
+        const posX = parseFloat(el.dataset.posX || 0);
+        const posY = parseFloat(el.dataset.posY || 0);
+        const rot = parseFloat(el.dataset.rot || 0);
+
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        el.style.transform = `translate(${posX}px, ${posY}px) rotate(${rot}deg) translateY(-125vh)`;
+        el.classList.remove('is-landed', 'is-dragging');
+      });
+    }
+
+    /* --- Hover por foto: resalta frente y despeja suavemente vecinas que se superpongan (sin zoom y sin volver a reunirse) --- */
+    _bindCardHover(el, idx) {
+      el.addEventListener('mouseenter', () => {
+        if (el.classList.contains('is-dragging')) return;
+
+        // Prioridad visual: traer la foto al frente
+        this.topZIndex++;
+        el.style.zIndex = this.topZIndex;
+
+        const curX = parseFloat(el.dataset.posX);
+        const curY = parseFloat(el.dataset.posY);
+
+        const cardW = el.offsetWidth || 260;
+        const cardH = el.offsetHeight || (cardW * 1.3913);
+        const hcx = curX + cardW / 2;
+        const hcy = curY + cardH / 2;
+
+        const minX = parseFloat(el.dataset.minX);
+        const maxX = parseFloat(el.dataset.maxX);
+        const minY = parseFloat(el.dataset.minY);
+        const maxY = parseFloat(el.dataset.maxY);
+
+        // Despejar suavemente las fotos contiguas que se estén tapando
+        this.items.forEach((other, oIdx) => {
+          if (other === el || other.classList.contains('is-dragging')) return;
+
+          const ox = parseFloat(other.dataset.posX);
+          const oy = parseFloat(other.dataset.posY);
+          const oRot = parseFloat(other.dataset.rot);
+
+          const ocx = ox + cardW / 2;
+          const ocy = oy + cardH / 2;
+
+          let dx = ocx - hcx;
+          let dy = ocy - hcy;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Si están próximas y se tapan (distancia menor al ancho de la tarjeta)
+          if (dist < cardW * 0.90) {
+            if (dist < 10) {
+              const angle = (oIdx * (Math.PI * 2 / this.items.length));
+              dx = Math.cos(angle);
+              dy = Math.sin(angle);
+              dist = 1;
+            }
+
+            // Despeje moderado (30px a 50px de apartamiento para ver lo de abajo, no se van a los bordes)
+            const push = Math.max(30, Math.min(50, (cardW * 0.90 - dist) * 0.35));
+            const nx = (dx / dist) * push;
+            const ny = (dy / dist) * push;
+
+            const newX = Math.max(minX, Math.min(maxX, Math.round(ox + nx)));
+            const newY = Math.max(minY, Math.min(maxY, Math.round(oy + ny)));
+
+            other.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+            other.style.transform = `translate(${newX}px, ${newY}px) rotate(${oRot}deg)`;
+
+            // PERSISTENCIA: Se quedan despejadas donde se movieron, ¡NO SE VUELVEN A REUNIR!
+            other.dataset.posX = newX;
+            other.dataset.posY = newY;
+          }
+        });
+      });
+      // NO hay listener de mouseleave que las vuelva a reunir: quedan abiertas sobre la mesa.
+    }
+
+    /* --- Drag & Drop: arrastre físico sin zoom que persiste donde se suelte --- */
+    _bindDrag(el, _idx) {
+      let startPX = 0, startPY = 0;
+      let startEX = 0, startEY = 0;
+      let dragging = false;
+
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        this.topZIndex++;
+        el.style.zIndex = this.topZIndex;
+
+        startPX = e.clientX;
+        startPY = e.clientY;
+
+        startEX = parseFloat(el.dataset.posX);
+        startEY = parseFloat(el.dataset.posY);
+        const curRot = parseFloat(el.dataset.rot);
+
+        dragging = true;
+        el.classList.add('is-dragging');
+        el.setPointerCapture(e.pointerId);
+
+        // Sin zoom, solo resalta la sombra en mano
+        el.style.transition = 'filter 0.2s ease';
+        el.style.transform = `translate(${startEX}px, ${startEY}px) rotate(${curRot}deg)`;
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startPX;
+        const dy = e.clientY - startPY;
+
+        const stageRect = this.stage.getBoundingClientRect();
+        const cardW = el.offsetWidth || 260;
+        const cardH = el.offsetHeight || (cardW * 1.3913);
+        const minX = 12;
+        const maxX = Math.max(minX, stageRect.width - cardW - 12);
+        const minY = 16;
+        const maxY = Math.max(minY, stageRect.height - cardH - 16);
+
+        const newX = Math.max(minX, Math.min(maxX, Math.round(startEX + dx)));
+        const newY = Math.max(minY, Math.min(maxY, Math.round(startEY + dy)));
+        const curRot = parseFloat(el.dataset.rot);
+
+        el.style.transition = 'none';
+        el.style.transform = `translate(${newX}px, ${newY}px) rotate(${curRot}deg)`;
+
+        el.dataset.posX = newX;
+        el.dataset.posY = newY;
+      });
+
+      const endDrag = (e) => {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('is-dragging');
+
+        const finalX = parseFloat(el.dataset.posX);
+        const finalY = parseFloat(el.dataset.posY);
+        const curRot = parseFloat(el.dataset.rot);
+
+        el.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.25s ease';
+        el.style.transform = `translate(${finalX}px, ${finalY}px) rotate(${curRot}deg)`;
+      };
+
+      el.addEventListener('pointerup', endDrag);
+      el.addEventListener('pointercancel', endDrag);
+    }
+
+    /* --- Recalcular dinámicamente si cambia el tamaño de la ventana --- */
+    _bindResize() {
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (document.body.getAttribute('data-category') === 'sobre-mi' &&
+              document.body.getAttribute('data-frame') === '2') {
+            const layouts = this._calculateLayouts();
+            this.items.forEach((el, i) => {
+              const l = layouts[i];
+              el.dataset.minX = l.minX;
+              el.dataset.maxX = l.maxX;
+              el.dataset.minY = l.minY;
+              el.dataset.maxY = l.maxY;
+
+              // Mantener la posición relativa o clampear dentro de los nuevos límites
+              const curX = parseFloat(el.dataset.posX || l.x);
+              const curY = parseFloat(el.dataset.posY || l.y);
+              const newX = Math.max(l.minX, Math.min(l.maxX, curX));
+              const newY = Math.max(l.minY, Math.min(l.maxY, curY));
+              el.dataset.posX = newX;
+              el.dataset.posY = newY;
+
+              if (el.classList.contains('is-landed') && !el.classList.contains('is-dragging')) {
+                el.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+                el.style.transform = `translate(${newX}px, ${newY}px) rotate(${el.dataset.rot}deg)`;
+              }
+            });
+          }
+        }, 150);
+      });
+    }
+
+    /* --- Escuchar cambios de categoría para tirar/resetear --- */
+    _bindCategoryChange() {
+      document.addEventListener('categorychange', (e) => {
+        if (e.detail.category === 'sobre-mi') {
+          setTimeout(() => this.throw(), 180);
+        } else {
+          this.reset();
+        }
+      });
+
+      // Transición de frame (Frame 1 → Frame 2 con sobre-mi activo)
+      document.addEventListener('framechange', (e) => {
+        if (e.detail.frame === 2) {
+          const active = document.body.getAttribute('data-category');
+          if (active === 'sobre-mi') {
+            setTimeout(() => this.throw(), 350);
+          }
+        } else {
+          this.reset();
+        }
+      });
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+   * 7. BOOTSTRAP DE LA APLICACIÓN
+   * -------------------------------------------------------------------------- */  const init = () => {
     initLoadAnimation();
     new TechGrid('techGridCanvas');
     new ContinuousInkAnimation();
@@ -1540,12 +1934,14 @@
     categoriesController.flyersManager = flyersManager;
 
     const frameController = new FrameTransitionController(categoriesController);
+    const polaroidsManager = new PolaroidsManager();
 
     // Exponer globalmente para depuración o llamadas desde consola si se requiere
     window.portfolio = {
       frameController,
       categoriesController,
-      flyersManager
+      flyersManager,
+      polaroidsManager
     };
   };
 

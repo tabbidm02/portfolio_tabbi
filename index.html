@@ -20,14 +20,14 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body data-frame="1">
+<body data-frame="1" data-category="sobre-mi">
   <!-- Filtro SVG nativo para efecto de tinta viva / stop-motion en lettering a mano -->
   <svg class="visually-hidden" aria-hidden="true">
     <defs>
       <filter id="inkWiggle">
-        <feTurbulence id="inkTurbulence" type="fractalNoise" baseFrequency="0.035" numOctaves="2" result="noise"
+        <feTurbulence id="inkTurbulence" type="fractalNoise" baseFrequency="0.035 0.02" numOctaves="3" result="noise"
           seed="1" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+        <feDisplacementMap id="inkDisplace" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
@@ -128,7 +128,7 @@
     <main class="category-display" id="categoryDisplay" aria-live="polite">
       <!-- 1. Sobre mi (Activa por defecto) -->
       <section class="category-panel is-active" id="panel-sobre-mi" role="tabpanel" aria-labelledby="tab-sobre-mi">
-        <div class="category-panel-placeholder" data-panel="sobre-mi"></div>
+        <div class="polaroids-stage" id="polaroidsStage"></div>
       </section>
 
       <!-- 2. Flyers -->
@@ -179,7 +179,7 @@
               Holaaa, me dicen Tabbi, tengo <span id="userAge">24</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.
             </p>
             <p>
-              Me concidero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola area, siento que siempre hay algo innovador para hacer.
+              Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola área, siento que siempre hay algo innovador para hacer.
             </p>
           </div>
         </div>
