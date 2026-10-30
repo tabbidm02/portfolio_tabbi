@@ -1678,25 +1678,28 @@
       const cardCenterY = cardRect.top + cardRect.height / 2;
 
       if (window.innerWidth <= 768) {
-        // En mobile: centrado en el espacio libre disponible sobre el panel
-        document.body.classList.remove('panel-mobile-collapsed');
+        // En mobile: mantener el panel colapsado abajo para dar protagonismo total al flyer
+        document.body.classList.add('panel-mobile-collapsed');
 
         const cardCenterX = cardRect.left + cardRect.width / 2;
         const screenCenterX = window.innerWidth / 2;
-
-        // Centrar en el área libre entre el menú superior (~14vh) y el panel compacto inferior (~110px)
-        const topNavHeight = window.innerHeight * 0.14;
-        const panelHeight = Math.min(130, window.innerHeight * 0.22);
-        const freeCenterY = topNavHeight + (window.innerHeight - topNavHeight - panelHeight) / 2;
+        const screenCenterY = window.innerHeight / 2;
 
         const offsetX = Math.round(screenCenterX - cardCenterX);
-        const offsetY = Math.round(freeCenterY - cardCenterY);
+        const offsetY = Math.round(screenCenterY - cardCenterY);
 
         cardEl.style.setProperty('--flyer-selected-offset-x', `${offsetX}px`);
         cardEl.style.setProperty('--flyer-selected-offset-y', `${offsetY}px`);
 
-        const mobileScale = flyer?.scale ? Math.min(flyer.scale, 1.45) : 1.30;
-        cardEl.style.setProperty('--mobile-flyer-scale', mobileScale);
+        // Escala ampliada y legible para mobile (aprovecha ~88% del ancho o ~60% del alto)
+        const maxScaleByWidth = (window.innerWidth * 0.88) / (cardRect.width || 155);
+        const maxScaleByHeight = (window.innerHeight * 0.60) / (cardRect.height || 195);
+        const dynamicScale = Math.min(maxScaleByWidth, maxScaleByHeight);
+        const mobileScale = flyer?.scale
+          ? Math.min(flyer.scale, 2.15)
+          : Math.max(1.85, Math.min(dynamicScale, 2.05));
+
+        cardEl.style.setProperty('--mobile-flyer-scale', mobileScale.toFixed(2));
       } else {
         // En desktop: centrado vertical exacto en la mitad de la pantalla (50vh)
         // Evita que los primeros flyers se recorten arriba por topar en scrollTop = 0

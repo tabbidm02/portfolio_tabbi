@@ -1811,15 +1811,15 @@ body.panel-open .description-panel {
   .flyers-col-2 .flyer-card.is-selected:hover,
   .flyers-col-3 .flyer-card.is-selected,
   .flyers-col-3 .flyer-card.is-selected:hover {
-    transform: translate3d(var(--flyer-selected-offset-x, 0px), var(--flyer-selected-offset-y, 0px), 0) scale(var(--mobile-flyer-scale, 1.40)) !important;
+    transform: translate3d(var(--flyer-selected-offset-x, 0px), var(--flyer-selected-offset-y, 0px), 0) scale(var(--mobile-flyer-scale, 1.95)) !important;
     z-index: 100 !important;
     opacity: 1 !important;
     filter: none !important;
     border-color: rgba(255, 255, 255, 0.55) !important;
     box-shadow: 
       0 0 0 1px rgba(255, 255, 255, 0.35),
-      0 24px 60px rgba(0, 0, 0, 0.95),
-      0 8px 24px rgba(0, 0, 0, 0.75) !important;
+      0 28px 75px rgba(0, 0, 0, 0.96),
+      0 10px 30px rgba(0, 0, 0, 0.8) !important;
   }
 
   /* Evitar recortes cuando un flyer está abierto en el centro de la pantalla */
