@@ -9,7 +9,8 @@
     content="Portfolio de Agustin Tabbita, Multimedial Designer. Exploración de diseño, interacción y experiencias digitales.">
 
   <!-- Favicon con el isotipo bb -->
-  <link rel="icon" type="image/svg+xml" href="/svg/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="svg/favicon.svg">
+  <link rel="shortcut icon" href="svg/favicon.svg">
 
   <!-- Google Fonts: Montserrat variable (200 a 400) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,11 +103,11 @@
           </button>
         </li>
 
-        <!-- 5. Etc -->
+        <!-- 5. Contacto -->
         <li class="category-wrapper" role="presentation">
-          <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-etc" id="tab-etc"
-            data-category="etc">
-            <span class="category-label">Etc</span>
+          <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-contacto" id="tab-contacto"
+            data-category="contacto">
+            <span class="category-label">Contacto</span>
             <span class="category-hover-line" aria-hidden="true"></span>
           </button>
         </li>
@@ -144,9 +145,9 @@
         <div class="category-panel-placeholder" data-panel="logofolio"></div>
       </section>
 
-      <!-- 5. Etc -->
-      <section class="category-panel" id="panel-etc" role="tabpanel" aria-labelledby="tab-etc">
-        <div class="category-panel-placeholder" data-panel="etc"></div>
+      <!-- 5. Contacto -->
+      <section class="category-panel" id="panel-contacto" role="tabpanel" aria-labelledby="tab-contacto">
+        <div class="category-panel-placeholder" data-panel="contacto"></div>
       </section>
     </main>
 
@@ -155,6 +156,10 @@
       <!-- Fondo claro con retícula técnica de Group 20.svg -->
       <div class="desc-panel-bg" aria-hidden="true">
         <img src="svg/Group 20.svg" alt="" class="desc-panel-grid" draggable="false">
+      </div>
+      <!-- Barra / Tirador táctil interactiva para mobile -->
+      <div class="panel-drag-handle" id="panelDragHandle" role="button" tabindex="0" aria-label="Desplegar o replegar información">
+        <div class="panel-drag-bar" aria-hidden="true"></div>
       </div>
       <!-- Contenedor de contenido y texto -->
       <div class="panel-content-wrapper" id="panelContentWrapper">

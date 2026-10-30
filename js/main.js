@@ -17,7 +17,10 @@
 
   const CARPETA_FLYERS = './flyers/';
 
-  // Texto introductorio inicial de la categoría (sin título, solo el párrafo):
+  // Título de la categoría Flyers en el panel lateral:
+  const TITULO_FLYERS = "Flyers";
+
+  // Texto introductorio inicial de la categoría:
   const TEXTO_INTRO_FLYERS = "Flyers, posters, afiches, postales. Piezas graficas que hago de cosas que me gustan, de cosas que vi, de lo que me fanatice o que simplemente tenia ganas de hacer.";
 
   // Configuración de Instagram y segundo párrafo para Flyers:
@@ -479,21 +482,26 @@
           return; // Permitir que la cinta de flyers scrollee libremente sin interferir con el cambio de categorías
         }
 
-        // Scroll hacia abajo: avanzar de Frame 1 a Frame 2, o navegar a la siguiente categoría
+        // En mobile (<= 768px), en Frame 2 no se cambia de sección por scroll: la navegación es exclusivamente por tap
+        if (window.innerWidth <= 768 && this.currentFrame === 2) {
+          return;
+        }
+
+        // Scroll hacia abajo: avanzar de Frame 1 a Frame 2, o navegar a la siguiente categoría (desktop)
         if (e.deltaY > 25) {
           if (this.currentFrame === 1) {
             this.throttle(1300);
             this.setFrame(2);
-          } else if (this.currentFrame === 2 && this.categoriesController) {
+          } else if (this.currentFrame === 2 && this.categoriesController && window.innerWidth > 768) {
             const advanced = this.categoriesController.nextCategory();
             if (advanced) {
               this.throttle(550);
             }
           }
         }
-        // Scroll hacia arriba: retroceder de categoría, o volver a Frame 1 si estamos en la primera
+        // Scroll hacia arriba: retroceder de categoría, o volver a Frame 1 si estamos en la primera (desktop)
         else if (e.deltaY < -25) {
-          if (this.currentFrame === 2 && this.categoriesController) {
+          if (this.currentFrame === 2 && this.categoriesController && window.innerWidth > 768) {
             const currentIndex = this.categoriesController.getCurrentIndex();
             if (currentIndex > 0) {
               this.categoriesController.prevCategory();
@@ -507,16 +515,18 @@
         }
       }, { passive: true });
 
-      // 2. Soporte táctil en panel lateral derecho para scrollear flyers
+      // 2. Soporte táctil en panel lateral derecho para scrollear flyers (exclusivo para desktop táctil)
       if (descPanel) {
         let panelTouchY = null;
         descPanel.addEventListener('touchstart', (e) => {
+          if (window.innerWidth <= 768) return; // En mobile el panel tiene su propio scroll de contenido
           if (e.touches.length > 0) {
             panelTouchY = e.touches[0].clientY;
           }
         }, { passive: true });
 
         descPanel.addEventListener('touchmove', (e) => {
+          if (window.innerWidth <= 768) return; // En mobile el panel tiene su propio scroll de contenido
           if (this.categoriesController?.activeCategory === 'flyers' && e.touches.length > 0 && panelTouchY !== null) {
             const currentY = e.touches[0].clientY;
             const deltaY = panelTouchY - currentY;
@@ -536,7 +546,7 @@
         }, { passive: true });
       }
 
-      // 3. Navegación táctil global (swipe) para smartphones y tablets
+      // 3. Navegación táctil global (swipe)
       let touchStartX = 0;
       window.addEventListener('touchstart', (e) => {
         if (e.touches.length > 0) {
@@ -547,6 +557,12 @@
 
       window.addEventListener('touchend', (e) => {
         if (this.isThrottled || e.changedTouches.length === 0) return;
+
+        // En mobile (<= 768px), en Frame 2 se desactiva totalmente el paso de sección por swipe/scroll.
+        // La navegación entre categorías en mobile es 100% por tap en el menú horizontal.
+        if (window.innerWidth <= 768 && this.currentFrame === 2) {
+          return;
+        }
 
         const touchEndX = e.changedTouches[0].clientX;
         const touchEndY = e.changedTouches[0].clientY;
@@ -569,16 +585,16 @@
           if (this.currentFrame === 1) {
             this.throttle(1300);
             this.setFrame(2);
-          } else if (this.currentFrame === 2 && this.categoriesController) {
+          } else if (this.currentFrame === 2 && this.categoriesController && window.innerWidth > 768) {
             const advanced = this.categoriesController.nextCategory();
             if (advanced) {
               this.throttle(550);
             }
           }
         }
-        // Swipe abajo (desplazar hacia arriba / retroceder)
+        // Swipe abajo (desplazar hacia arriba / retroceder en desktop)
         else if (deltaY < -50) {
-          if (this.currentFrame === 2 && this.categoriesController) {
+          if (this.currentFrame === 2 && this.categoriesController && window.innerWidth > 768) {
             const currentIndex = this.categoriesController.getCurrentIndex();
             if (currentIndex > 0) {
               this.categoriesController.prevCategory();
@@ -733,7 +749,7 @@
       desc: getTextoSobreMi
     },
     'flyers': {
-      title: '', // Sin título en el estado introductorio
+      title: TITULO_FLYERS,
       desc: ''
     },
     'multimediales': {
@@ -744,9 +760,9 @@
       title: 'Logofolio',
       desc: 'Desarrollo de marcas, síntesis formal e identidades visuales pensadas para perdurar y adaptarse dinámicamente a entornos físicos y digitales.'
     },
-    'etc': {
-      title: 'Etc',
-      desc: 'Proyectos inclasificables, bocetos, pruebas de concepto y exploraciones libres que alimentan el proceso creativo diario.'
+    'contacto': {
+      title: 'Contacto',
+      desc: 'Canales directos de comunicación, colaboraciones y proyectos. Disponible para propuestas de diseño, desarrollo interactivo y experiencias digitales.'
     }
   };
 
@@ -787,12 +803,132 @@
 
     init() {
       this.bindCategoryClicks();
+      this.bindMobileInteractions();
       this.bindResize();
       document.body.setAttribute('data-category', 'sobre-mi');
       // Inicializar posición de la línea indicadora
       this.updateActiveLine(false);
       // Inicializar texto de la categoría inicial
       this.updateDescContent('sobre-mi');
+    }
+
+    bindMobileInteractions() {
+      const dragHandle = document.getElementById('panelDragHandle');
+      const panel = this.panel;
+      if (!panel) return;
+
+      // Determinar si el panel se encuentra actualmente expandido
+      const isExpanded = () => {
+        return !document.body.classList.contains('panel-mobile-collapsed');
+      };
+
+      // Establecer estado expandido o colapsado (unificado para todas las categorías)
+      const setExpanded = (expand) => {
+        if (expand) {
+          document.body.classList.remove('panel-mobile-collapsed');
+        } else {
+          document.body.classList.add('panel-mobile-collapsed');
+        }
+      };
+
+      const toggleExpanded = () => {
+        setExpanded(!isExpanded());
+      };
+
+      // 1. Manejo de Tap y Deslizamiento (Swipe / Drag) en la barra del panel
+      let touchStartY = 0;
+      let touchStartX = 0;
+      let touchStartTime = 0;
+      let isInteracting = false;
+
+      // El área interactiva principal es el tirador dragHandle; si no existe, el panel
+      const handleArea = dragHandle || panel;
+
+      handleArea.addEventListener('touchstart', (e) => {
+        if (window.innerWidth > 768) return;
+        if (document.body.classList.contains('flyer-selected')) return;
+        if (e.touches.length === 1) {
+          touchStartY = e.touches[0].clientY;
+          touchStartX = e.touches[0].clientX;
+          touchStartTime = performance.now();
+          isInteracting = true;
+        }
+      }, { passive: true });
+
+      handleArea.addEventListener('touchmove', (e) => {
+        if (!isInteracting || window.innerWidth > 768 || e.touches.length === 0) return;
+      }, { passive: true });
+
+      handleArea.addEventListener('touchend', (e) => {
+        if (!isInteracting || window.innerWidth > 768) return;
+        isInteracting = false;
+        if (e.changedTouches.length === 0) return;
+
+        const touchEndY = e.changedTouches[0].clientY;
+        const touchEndX = e.changedTouches[0].clientX;
+        const deltaY = touchEndY - touchStartY;
+        const deltaX = touchEndX - touchStartX;
+        const duration = performance.now() - touchStartTime;
+
+        // Deslizamiento vertical sobre la barra:
+        if (Math.abs(deltaY) >= 20 && Math.abs(deltaY) > Math.abs(deltaX)) {
+          if (deltaY > 0) {
+            // Deslizó hacia abajo -> Colapsar / Ocultar texto hasta el título
+            setExpanded(false);
+          } else {
+            // Deslizó hacia arriba -> Expandir / Mostrar
+            setExpanded(true);
+          }
+        } else if (Math.abs(deltaY) < 12 && Math.abs(deltaX) < 12 && duration < 500) {
+          // Tap sobre la barra -> Alternar mostrar / ocultar
+          if (!e.target.closest('a')) {
+            toggleExpanded();
+          }
+        }
+      }, { passive: true });
+
+      // Click / Tap para mouse o emuladores en la barra
+      if (dragHandle) {
+        dragHandle.addEventListener('click', (e) => {
+          if (window.innerWidth <= 768) {
+            if (document.body.classList.contains('flyer-selected')) return;
+            e.stopPropagation();
+            toggleExpanded();
+          }
+        });
+      }
+
+      // Si el panel está colapsado y se toca en cualquier parte de su cabecera, expandir
+      panel.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+          if (document.body.classList.contains('flyer-selected')) return;
+          if (document.body.classList.contains('panel-mobile-collapsed')) {
+            e.stopPropagation();
+            setExpanded(true);
+          }
+        }
+      });
+
+      // Click o tap fuera del panel colapsa el panel hasta el título en mobile
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+          if (document.body.classList.contains('flyer-selected')) return;
+          if (!document.body.classList.contains('panel-mobile-collapsed')) {
+            if (!e.target.closest('#categoryDescPanel') && !e.target.closest('#categoriesNav') && !e.target.closest('#titleHomeBtn')) {
+              setExpanded(false);
+            }
+          }
+        }
+      });
+
+      // 3. Durante el swipe táctil horizontal de las categorías, sincronizar la línea activa
+      if (this.list) {
+        this.list.addEventListener('scroll', () => {
+          if (window.innerWidth <= 768) {
+            this._renderMobileActiveLine(false);
+          }
+        }, { passive: true });
+      }
     }
 
     bindCategoryClicks() {
@@ -830,7 +966,7 @@
 
     /**
      * Muestra el texto introductorio de Flyers en el panel derecho:
-     * Sin título y sin línea divisoria (solo los párrafos descriptivos y el botón de Instagram)
+     * Con título, línea divisoria, párrafos descriptivos y el botón de Instagram
      */
     showFlyersIntro() {
       if (this.panelTextContainer) {
@@ -838,11 +974,11 @@
       }
       setTimeout(() => {
         if (this.panelTitle) {
-          this.panelTitle.textContent = '';
-          this.panelTitle.classList.add('is-hidden');
+          this.panelTitle.textContent = TITULO_FLYERS;
+          this.panelTitle.classList.remove('is-hidden');
         }
         if (this.panelLine) {
-          this.panelLine.classList.add('is-hidden');
+          this.panelLine.classList.remove('is-hidden');
         }
         if (this.panelDesc) {
           this.panelDesc.innerHTML = `
@@ -991,6 +1127,7 @@
 
       this.activeCategory = categoryName;
       document.body.setAttribute('data-category', categoryName);
+      document.body.classList.remove('panel-mobile-expanded', 'panel-mobile-collapsed', 'flyer-selected');
 
       // 1. Instante 0s: Actualizar estados de botones inmediatamente
       this.items.forEach((btn) => {
@@ -1022,14 +1159,61 @@
       }
     }
 
+    _renderMobileActiveLine(smooth = true) {
+      const activeBtn = this.items.find(btn => btn.classList.contains('is-active'));
+      if (!activeBtn || !this.activeLine || !this.list || !this.nav) return;
+
+      const navRect = this.nav.getBoundingClientRect();
+      const labelEl = activeBtn.querySelector('.category-label') || activeBtn;
+      const labelRect = labelEl.getBoundingClientRect();
+
+      const leftOffset = labelRect.left - navRect.left;
+      const topOffset = labelRect.bottom - navRect.top + 3;
+      const lineWidth = Math.max(22, Math.round(labelRect.width));
+
+      if (!smooth) {
+        this.activeLine.style.transition = 'none';
+      } else {
+        this.activeLine.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), width 0.45s ease';
+      }
+
+      this.activeLine.style.width = `${lineWidth}px`;
+      this.activeLine.style.transform = `translate3d(${Math.round(leftOffset)}px, ${Math.round(topOffset)}px, 0)`;
+
+      if (!smooth) {
+        requestAnimationFrame(() => {
+          this.activeLine.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), width 0.45s ease';
+        });
+      }
+    }
+
     updateActiveLine(smooth = true) {
       const activeBtn = this.items.find(btn => btn.classList.contains('is-active'));
       if (!activeBtn || !this.activeLine || !this.list) return;
 
+      // Soporte Mobile (<= 768px): Navegación horizontal swipeable con auto-scroll centrado
+      if (window.innerWidth <= 768) {
+        // Auto-scroll horizontal para centrar el botón elegido
+        const listWidth = this.list.clientWidth;
+        const btnLeft = activeBtn.offsetLeft;
+        const btnWidth = activeBtn.offsetWidth;
+        const targetScroll = Math.max(0, btnLeft - (listWidth / 2) + (btnWidth / 2));
+
+        this.list.scrollTo({
+          left: targetScroll,
+          behavior: smooth ? 'smooth' : 'auto'
+        });
+
+        // Posicionamiento de la barra deslizante debajo del texto activo
+        this._renderMobileActiveLine(smooth);
+        return;
+      }
+
+      // Modo Desktop: Posicionamiento vertical matemáticamente estable sin saltos de escala
+      this.activeLine.style.width = '';
       const wrapper = activeBtn.closest('.category-wrapper');
       if (!wrapper) return;
 
-      // Posicionamiento vertical matemáticamente estable sin saltos de escala
       const topOffset = wrapper.offsetTop + activeBtn.offsetHeight - 2;
 
       if (!smooth) {
@@ -1092,6 +1276,7 @@
       this.shuffledList = [];
       this.selectedFlyerIndex = null;
       this.selectedCard = null;
+      this.currentNumCols = window.innerWidth <= 768 ? 2 : 3;
 
       // Parámetros de la cinta de empaque (auto-scroll continuo)
       this.isAutoScrolling = false;
@@ -1120,10 +1305,15 @@
 
     /**
      * Baraja aleatoriamente los flyers y crea dos lotes idénticos en cada columna
-     * para lograr un bucle infinito matemáticamente continuo ("cinta de empaque") en 3 columnas
+     * para lograr un bucle infinito matemáticamente continuo ("cinta de empaque").
+     * En mobile (<= 768px): 2 columnas amplias legibles. En desktop (> 768px): 3 columnas asimétricas.
      */
     shuffleAndRender() {
-      if (!this.col1 || !this.col2 || !this.col3) return;
+      const isMobile = window.innerWidth <= 768;
+      const numCols = isMobile ? 2 : 3;
+      this.currentNumCols = numCols;
+
+      if (!this.col1 || !this.col2 || (!isMobile && !this.col3)) return;
 
       this.stopAutoScroll();
       this.stopRotations();
@@ -1132,8 +1322,15 @@
 
       this.col1.innerHTML = '';
       this.col2.innerHTML = '';
-      this.col3.innerHTML = '';
+      if (this.col3) this.col3.innerHTML = '';
       this.cards = [];
+
+      // En mobile ocultamos visualmente la 3ra columna para que las otras 2 se expandan al 100%
+      if (isMobile) {
+        if (this.col3) this.col3.style.display = 'none';
+      } else {
+        if (this.col3) this.col3.style.display = '';
+      }
 
       // 1. Barajar aleatoriamente la lista de flyers (Fisher-Yates Shuffle)
       const list = [...LISTA_FLYERS];
@@ -1143,7 +1340,7 @@
       }
       this.shuffledList = list;
 
-      // 2. Crear contenedores de lotes (Batch 1 y Batch 2 para el loop infinito en 3 columnas)
+      // 2. Crear contenedores de lotes (Batch 1 y Batch 2 para el loop infinito)
       this.col1Batch1 = document.createElement('div');
       this.col1Batch1.className = 'flyers-batch flyers-batch-1';
       this.col1Batch2 = document.createElement('div');
@@ -1154,21 +1351,26 @@
       this.col2Batch2 = document.createElement('div');
       this.col2Batch2.className = 'flyers-batch flyers-batch-2';
 
-      this.col3Batch1 = document.createElement('div');
-      this.col3Batch1.className = 'flyers-batch flyers-batch-1';
-      this.col3Batch2 = document.createElement('div');
-      this.col3Batch2.className = 'flyers-batch flyers-batch-2';
+      if (!isMobile && this.col3) {
+        this.col3Batch1 = document.createElement('div');
+        this.col3Batch1.className = 'flyers-batch flyers-batch-1';
+        this.col3Batch2 = document.createElement('div');
+        this.col3Batch2.className = 'flyers-batch flyers-batch-2';
+      } else {
+        this.col3Batch1 = null;
+        this.col3Batch2 = null;
+      }
 
-      // 3. Distribuir de forma alternada en 3 columnas
+      // 3. Distribuir de forma alternada en numCols columnas (2 en mobile, 3 en desktop)
       // Lote 1 (Principal):
       list.forEach((item, index) => {
-        const colMod = index % 3;
+        const colMod = index % numCols;
         const cardObj = this.createCardElement(item, index, false);
         if (colMod === 0) {
           this.col1Batch1.appendChild(cardObj.card);
         } else if (colMod === 1) {
           this.col2Batch1.appendChild(cardObj.card);
-        } else {
+        } else if (this.col3Batch1) {
           this.col3Batch1.appendChild(cardObj.card);
         }
         this.cards.push(cardObj);
@@ -1176,13 +1378,13 @@
 
       // Lote 2 (Duplicado exacto para bucle infinito sin salto visual):
       list.forEach((item, index) => {
-        const colMod = index % 3;
+        const colMod = index % numCols;
         const cloneObj = this.createCardElement(item, index, true);
         if (colMod === 0) {
           this.col1Batch2.appendChild(cloneObj.card);
         } else if (colMod === 1) {
           this.col2Batch2.appendChild(cloneObj.card);
-        } else {
+        } else if (this.col3Batch2) {
           this.col3Batch2.appendChild(cloneObj.card);
         }
         this.cards.push(cloneObj);
@@ -1192,8 +1394,10 @@
       this.col1.appendChild(this.col1Batch2);
       this.col2.appendChild(this.col2Batch1);
       this.col2.appendChild(this.col2Batch2);
-      this.col3.appendChild(this.col3Batch1);
-      this.col3.appendChild(this.col3Batch2);
+      if (!isMobile && this.col3 && this.col3Batch1 && this.col3Batch2) {
+        this.col3.appendChild(this.col3Batch1);
+        this.col3.appendChild(this.col3Batch2);
+      }
 
       this.equalizeBatchHeights();
     }
@@ -1285,39 +1489,44 @@
     }
 
     /**
-     * Sincroniza las alturas de los lotes entre las 3 columnas para que
-     * la cinta de empaque repita su ciclo en el píxel exacto sin saltos.
+     * Sincroniza las alturas de los lotes entre las columnas activas (2 en mobile, 3 en desktop)
+     * para que la cinta de empaque repita su ciclo en el píxel exacto sin saltos.
      */
     equalizeBatchHeights() {
-      if (!this.col1Batch1 || !this.col2Batch1 || !this.col3Batch1) return;
+      if (!this.col1Batch1 || !this.col2Batch1) return;
+      const isMobile = window.innerWidth <= 768;
 
       this.col1Batch1.style.minHeight = '0px';
       this.col2Batch1.style.minHeight = '0px';
-      this.col3Batch1.style.minHeight = '0px';
       if (this.col1Batch2) this.col1Batch2.style.minHeight = '0px';
       if (this.col2Batch2) this.col2Batch2.style.minHeight = '0px';
-      if (this.col3Batch2) this.col3Batch2.style.minHeight = '0px';
 
-      const h1 = this.col1Batch1.offsetHeight;
-      const h2 = this.col2Batch1.offsetHeight;
-      const h3 = this.col3Batch1.offsetHeight;
-      const maxH = Math.max(h1, h2, h3);
+      let maxH = Math.max(this.col1Batch1.offsetHeight, this.col2Batch1.offsetHeight);
+
+      if (!isMobile && this.col3Batch1) {
+        this.col3Batch1.style.minHeight = '0px';
+        if (this.col3Batch2) this.col3Batch2.style.minHeight = '0px';
+        maxH = Math.max(maxH, this.col3Batch1.offsetHeight);
+      }
 
       if (maxH > 100) {
         this.batchHeight = maxH;
         this.col1Batch1.style.minHeight = `${maxH}px`;
         this.col2Batch1.style.minHeight = `${maxH}px`;
-        this.col3Batch1.style.minHeight = `${maxH}px`;
         if (this.col1Batch2) this.col1Batch2.style.minHeight = `${maxH}px`;
         if (this.col2Batch2) this.col2Batch2.style.minHeight = `${maxH}px`;
-        if (this.col3Batch2) this.col3Batch2.style.minHeight = `${maxH}px`;
+
+        if (!isMobile && this.col3Batch1) {
+          this.col3Batch1.style.minHeight = `${maxH}px`;
+          if (this.col3Batch2) this.col3Batch2.style.minHeight = `${maxH}px`;
+        }
       }
     }
 
     bindEvents() {
       // 1. Clic fuera de cualquier tarjeta deselecciona inmediatamente y reanuda la cinta
       document.addEventListener('click', (e) => {
-        if (this.selectedCard && !e.target.closest('.flyer-card')) {
+        if (this.selectedCard && !e.target.closest('.flyer-card') && !e.target.closest('#categoryDescPanel')) {
           this.deselectAll();
         }
       });
@@ -1341,9 +1550,15 @@
         }
       });
 
-      // 4. Ajuste responsivo de la altura de los lotes
+      // 4. Ajuste responsivo de columnas (2 en mobile, 3 en desktop) y altura de lotes
       window.addEventListener('resize', () => {
-        this.equalizeBatchHeights();
+        const isMobile = window.innerWidth <= 768;
+        const targetCols = isMobile ? 2 : 3;
+        if (targetCols !== this.currentNumCols) {
+          this.shuffleAndRender();
+        } else {
+          this.equalizeBatchHeights();
+        }
       });
 
       // 5. Garantizar envoltura instantánea del bucle continuo al scrollear manualmente
@@ -1421,6 +1636,15 @@
     }
 
     selectFlyer(index, cardEl) {
+      if (this.selectedCard && this.selectedCard !== cardEl) {
+        const prevCard = this.selectedCard;
+        setTimeout(() => {
+          prevCard.style.removeProperty('--flyer-selected-offset-x');
+          prevCard.style.removeProperty('--flyer-selected-offset-y');
+          prevCard.style.removeProperty('--mobile-flyer-scale');
+        }, 450);
+      }
+
       this.selectedFlyerIndex = index;
       this.selectedCard = cardEl;
       this.selectionTimestamp = performance.now();
@@ -1445,56 +1669,74 @@
         this.col3.style.zIndex = isCol3 ? '60' : '1';
       }
 
+      document.body.classList.add('flyer-selected');
+
+      const flyer = this.shuffledList[index];
+
+      // Centrado vertical exacto tanto en mobile como en desktop
+      const cardRect = cardEl.getBoundingClientRect();
+      const cardCenterY = cardRect.top + cardRect.height / 2;
+
+      if (window.innerWidth <= 768) {
+        // En mobile: centrado en el espacio libre disponible sobre el panel
+        document.body.classList.remove('panel-mobile-collapsed');
+
+        const cardCenterX = cardRect.left + cardRect.width / 2;
+        const screenCenterX = window.innerWidth / 2;
+
+        // Centrar en el área libre entre el menú superior (~14vh) y el panel compacto inferior (~110px)
+        const topNavHeight = window.innerHeight * 0.14;
+        const panelHeight = Math.min(130, window.innerHeight * 0.22);
+        const freeCenterY = topNavHeight + (window.innerHeight - topNavHeight - panelHeight) / 2;
+
+        const offsetX = Math.round(screenCenterX - cardCenterX);
+        const offsetY = Math.round(freeCenterY - cardCenterY);
+
+        cardEl.style.setProperty('--flyer-selected-offset-x', `${offsetX}px`);
+        cardEl.style.setProperty('--flyer-selected-offset-y', `${offsetY}px`);
+
+        const mobileScale = flyer?.scale ? Math.min(flyer.scale, 1.45) : 1.30;
+        cardEl.style.setProperty('--mobile-flyer-scale', mobileScale);
+      } else {
+        // En desktop: centrado vertical exacto en la mitad de la pantalla (50vh)
+        // Evita que los primeros flyers se recorten arriba por topar en scrollTop = 0
+        const screenCenterY = window.innerHeight / 2;
+        const offsetY = Math.round(screenCenterY - cardCenterY);
+        cardEl.style.setProperty('--flyer-selected-offset-y', `${offsetY}px`);
+      }
+
       // 3. Actualizar estado visual y escala en las tarjetas
       this.cards.forEach((c) => {
         const isCurrent = (c.card === cardEl);
         c.card.classList.toggle('is-selected', isCurrent);
       });
 
-      // 4. Centrar suavemente en el flyer seleccionado
-      this.centerCard(cardEl);
-
-      // 5. Mostrar título y descripción en el panel derecho
-      const flyer = this.shuffledList[index];
+      // 4. Mostrar título y descripción en el panel derecho / bottom sheet
       if (this.categoriesController && flyer) {
         this.categoriesController.showFlyerDetail(flyer);
       }
     }
 
     centerCard(cardEl) {
-      if (!this.scrollContainer || !cardEl) return;
-
-      const containerRect = this.scrollContainer.getBoundingClientRect();
-      const cardRect = cardEl.getBoundingClientRect();
-
-      const cardCenter = cardRect.top + cardRect.height / 2;
-      const containerCenter = containerRect.top + containerRect.height / 2;
-      const deltaY = cardCenter - containerCenter;
-
-      let targetScrollTop = this.scrollContainer.scrollTop + deltaY;
-
-      // Mantener targetScrollTop dentro del rango del bucle continuo sin topar en 0
-      if (this.batchHeight > 200) {
-        if (targetScrollTop < 0) {
-          this.scrollContainer.scrollTop += this.batchHeight;
-          targetScrollTop += this.batchHeight;
-        } else if (targetScrollTop >= this.batchHeight * 1.5) {
-          this.scrollContainer.scrollTop -= this.batchHeight;
-          targetScrollTop -= this.batchHeight;
-        }
-      }
-
-      this.scrollContainer.scrollTo({
-        top: Math.max(0, targetScrollTop),
-        behavior: 'smooth'
-      });
+      // Reemplazado por transform directo con --flyer-selected-offset-y
+      return;
     }
 
     deselectAll(resumeAutoScroll = true) {
       if (this.selectedFlyerIndex === null && !this.selectedCard) return;
 
+      const previouslySelectedCard = this.selectedCard;
+
       this.selectedFlyerIndex = null;
       this.selectedCard = null;
+
+      // Quitar clase de flyer seleccionado y de expansión manual en body
+      document.body.classList.remove('flyer-selected', 'panel-mobile-expanded');
+
+      // En mobile (<= 768px): al salir del flyer, mantener el panel general colapsado (74px) para no tapar los flyers
+      if (window.innerWidth <= 768) {
+        document.body.classList.add('panel-mobile-collapsed');
+      }
 
       // Quitar clases de enfoque en la grilla y restablecer z-index de columnas
       if (this.grid) {
@@ -1507,6 +1749,15 @@
       }
 
       this.cards.forEach(c => c.card.classList.remove('is-selected'));
+
+      // Limpiar propiedades personalizadas tras completar la animación de retorno
+      if (previouslySelectedCard) {
+        setTimeout(() => {
+          previouslySelectedCard.style.removeProperty('--flyer-selected-offset-x');
+          previouslySelectedCard.style.removeProperty('--flyer-selected-offset-y');
+          previouslySelectedCard.style.removeProperty('--mobile-flyer-scale');
+        }, 540);
+      }
 
       // Restaurar texto introductorio en el panel derecho solo si seguimos en Flyers
       if (this.categoriesController && this.categoriesController.activeCategory === 'flyers') {
@@ -1663,14 +1914,22 @@
 
     /* --- Calcular posiciones orgánicas sobre la mesa --- */
     _calculateLayouts() {
+      const isMobile = window.innerWidth <= 768;
       const stageRect = this.stage.getBoundingClientRect();
-      const stageW = stageRect.width || this.stage.offsetWidth || (window.innerWidth * 0.55);
-      const stageH = stageRect.height || this.stage.offsetHeight || window.innerHeight;
+      const stageW = stageRect.width || this.stage.offsetWidth || (window.innerWidth * (isMobile ? 0.92 : 0.55));
+      let stageH = stageRect.height || this.stage.offsetHeight || window.innerHeight;
+
+      // En mobile (<= 768px): el bottom sheet cubre el 42dvh inferior; ajustamos el alto efectivo de la mesa
+      if (isMobile) {
+        stageH = Math.max(220, window.innerHeight * 0.42);
+      }
 
       const sample = this.items[0];
-      const cardW = (sample && sample.offsetWidth > 40)
-        ? sample.offsetWidth
-        : Math.min(350, Math.max(245, stageW * 0.22));
+      const cardW = isMobile
+        ? Math.min(180, Math.max(130, stageW * 0.38))
+        : ((sample && sample.offsetWidth > 40)
+            ? sample.offsetWidth
+            : Math.min(350, Math.max(245, stageW * 0.22)));
       const cardH = cardW * 1.3913; // proporción 989:1376 de los SVGs
 
       // Margen de seguridad estricto para no tocar los bordes de la pantalla
