@@ -658,11 +658,72 @@
   /* --------------------------------------------------------------------------
    * 5. DATOS Y CONTROLADOR DEL MENÚ DE CATEGORÍAS & PANEL DE DESCRIPCIÓN
    * -------------------------------------------------------------------------- */
+  let cachedSobreMiHtml = null;
+
   const getTextoSobreMi = () => {
+    // Si el usuario editó index.html directamente, capturamos automáticamente su HTML del DOM
+    if (!cachedSobreMiHtml) {
+      const descEl = document.getElementById('panelCategoryDesc');
+      if (descEl && descEl.innerHTML.trim().length > 0) {
+        cachedSobreMiHtml = descEl.innerHTML;
+      }
+    }
+
     const edad = calcularEdad();
+
+    if (cachedSobreMiHtml) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cachedSobreMiHtml;
+      const ageSpan = tempDiv.querySelector('#userAge');
+      if (ageSpan) {
+        ageSpan.textContent = edad.toString();
+      }
+      return tempDiv.innerHTML;
+    }
+
     return `
-      <p>Holaaa, me dicen Tabbi, tengo <span id="userAge">${edad}</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.</p>
-      <p>Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola área, siento que siempre hay algo innovador para hacer.</p>
+      <p>Holaa, me dicen Tabbi, tengo <span id="userAge">${edad}</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.</p>
+      <p>Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí Diseño Multimedial porque me cuesta quedarme con una sola área del diseño y arte, siento que siempre hay algo innovador para hacer.</p>
+      <p>Me gustan mucho los videojuegos, la musica y el cine. No me encasillo en un solo genero, siento que todo tiene algo bueno para ofrecer.</p>
+      <p>Por ese mismo motivo creo que Diseño Multimedial es la carrera perfecta para mí, y es un poco lo que demuestro en este portfolio.</p>
+      <div class="apps-section">
+        <p class="apps-title">Aplicaciones que realmente sé usar:</p>
+        <div class="apps-grid">
+          <!-- Fila 1 -->
+          <div class="app-item" data-app="Resolume Arena">
+            <div class="app-icon-box">
+              <img src="svg/image 2.svg" alt="Resolume Arena" class="app-icon" draggable="false">
+            </div>
+            <span class="app-name">Resolume Arena</span>
+          </div>
+          <div class="app-item" data-app="TouchDesigner">
+            <div class="app-icon-box">
+              <img src="svg/image 1.svg" alt="TouchDesigner" class="app-icon" draggable="false">
+            </div>
+            <span class="app-name">TouchDesigner</span>
+          </div>
+          <div class="app-item" data-app="Figma">
+            <div class="app-icon-box">
+              <img src="svg/image 3.svg" alt="Figma" class="app-icon" draggable="false">
+            </div>
+            <span class="app-name">Figma</span>
+          </div>
+
+          <!-- Fila 2 -->
+          <div class="app-item" data-app="Illustrator">
+            <div class="app-icon-box">
+              <img src="svg/image 4.svg" alt="Illustrator" class="app-icon" draggable="false">
+            </div>
+            <span class="app-name">Illustrator</span>
+          </div>
+          <div class="app-item" data-app="Antigravity">
+            <div class="app-icon-box">
+              <img src="svg/image 5.svg" alt="Antigravity" class="app-icon" draggable="false">
+            </div>
+            <span class="app-name">Antigravity</span>
+          </div>
+        </div>
+      </div>
     `;
   };
 
@@ -678,10 +739,6 @@
     'multimediales': {
       title: 'Multimediales',
       desc: 'Instalaciones interactivas, motion graphics y proyectos audiovisuales que exploran el espacio, el tiempo y la relación activa con el espectador.'
-    },
-    'vibecode': {
-      title: 'Vibecode',
-      desc: 'Sistemas generativos, algoritmos visuales, shaders y experimentos de código donde la matemática se convierte en expresión estética y movimiento vivo.'
     },
     'logofolio': {
       title: 'Logofolio',
@@ -791,15 +848,15 @@
           this.panelDesc.innerHTML = `
             <p>${TEXTO_INTRO_FLYERS}</p>
             <p>${TEXTO_INSTAGRAM_FLYERS}</p>
-            <a href="${URL_INSTAGRAM}" target="_blank" rel="noopener noreferrer" class="panel-btn-instagram" aria-label="Ver cuenta de Instagram">
-              <svg class="btn-ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-              <span>Ver en Instagram</span>
-              <svg class="btn-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="7" y1="17" x2="17" y2="7"></line>
-                <polyline points="7 7 17 7 17 17"></polyline>
-              </svg>
+            <a href="${URL_INSTAGRAM}" target="_blank" rel="noopener noreferrer" class="panel-btn-instagram" aria-label="Ver más en @tabbidm02">
+              <span class="btn-ig-icon-box" aria-hidden="true">
+                <svg class="btn-ig-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </span>
+              <span class="btn-ig-text">ver más en @tabbidm02</span>
             </a>
           `;
         }
@@ -1554,6 +1611,10 @@
         'svg/Group 23.svg',
         'svg/Group 24.svg',
         'svg/Group 25.svg',
+        'svg/Group 26.svg',
+        'svg/Group 27.svg',
+        'svg/Group 28.svg',
+        'svg/Group 29.svg',
         'svg/Capa 233.svg'
       ];
       this.items = [];
@@ -1622,17 +1683,21 @@
 
       const cx = (minX + maxX) / 2;
       const cy = (minY + maxY) / 2;
-      const spreadX = (maxX - minX) * 0.38;
-      const spreadY = (maxY - minY) * 0.36;
+      const spreadX = (maxX - minX) * 0.40;
+      const spreadY = (maxY - minY) * 0.38;
 
-      // 6 posiciones armónicas para que aterricen como fotos arrojadas en una mesa
+      // 10 posiciones armónicas y variadas para que aterricen orgánicamente sobre la mesa
       const baseConfig = [
-        { ox: -0.42, oy: -0.40, rot: -7.5 },  // 1. Arriba izq
-        { ox:  0.38, oy: -0.38, rot:  8.0 },  // 2. Arriba der
-        { ox: -0.14, oy: -0.04, rot: -3.5 },  // 3. Centro izq
-        { ox:  0.22, oy:  0.08, rot:  6.5 },  // 4. Centro der
-        { ox: -0.36, oy:  0.38, rot: -5.5 },  // 5. Abajo izq
-        { ox:  0.16, oy:  0.34, rot:  4.0 }   // 6. Abajo der
+        { ox: -0.44, oy: -0.42, rot: -8.0 },  // 1. Arriba izquierda
+        { ox:  0.38, oy: -0.38, rot:  9.5 },  // 2. Arriba derecha
+        { ox: -0.04, oy: -0.44, rot: -3.0 },  // 3. Arriba centro
+        { ox: -0.38, oy: -0.08, rot:  6.0 },  // 4. Centro izquierda
+        { ox: -0.08, oy: -0.04, rot: -7.5 },  // 5. Centro ligeramente izq
+        { ox:  0.28, oy: -0.06, rot:  4.5 },  // 6. Centro derecha
+        { ox: -0.42, oy:  0.38, rot: -9.0 },  // 7. Abajo izquierda
+        { ox: -0.08, oy:  0.36, rot:  3.5 },  // 8. Abajo centro
+        { ox:  0.34, oy:  0.35, rot: -5.0 },  // 9. Abajo derecha
+        { ox:  0.12, oy:  0.15, rot:  7.5 }   // 10. Centro-bajo
       ];
 
       const layouts = [];
@@ -1707,7 +1772,7 @@
           if (i === this.items.length - 1) {
             setTimeout(() => { this.isAnimating = false; }, 900);
           }
-        }, i * 120);
+        }, i * 95);
         this.throwTimers.push(t);
       });
     }

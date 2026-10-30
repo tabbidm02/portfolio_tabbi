@@ -63,6 +63,11 @@ body[data-category="sobre-mi"] {
   --panel-max-width: var(--panel-max-width-sobre-mi);
 }
 
+body[data-category="sobre-mi"] .panel-text-container {
+  padding-right: var(--pos-logo-right);
+  padding-bottom: calc(var(--pos-logo-bottom) + clamp(22px, 2.6vh, 34px));
+}
+
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -375,9 +380,6 @@ body[data-frame="2"] .category-wrapper:nth-child(4) .category-item {
 }
 body[data-frame="2"] .category-wrapper:nth-child(5) .category-item {
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.87s, opacity 0.5s ease 0.87s;
-}
-body[data-frame="2"] .category-wrapper:nth-child(6) .category-item {
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.95s, opacity 0.5s ease 0.95s;
 }
 
 /* --- TIPOGRAFÍA Y ESCALADO ULTRA SUAVE (Sin saltos de glifos ni layout shifts) --- */
@@ -1101,6 +1103,8 @@ body.panel-open .description-panel {
 
 .panel-text-container,
 .description-text-inner {
+  min-height: 100%;
+  box-sizing: border-box;
   padding: clamp(3rem, 4.5vh, 4rem) clamp(2rem, 2.4vw, 3rem) clamp(5rem, 12vh, 8rem) clamp(2rem, 2.4vw, 3rem);
   color: #212121;
   font-family: 'Montserrat', sans-serif;
@@ -1162,6 +1166,10 @@ body.panel-open .description-panel {
   line-height: 1.75;
   color: #212121;
   opacity: 0.85;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
 }
 
 .panel-category-desc p {
@@ -1173,69 +1181,196 @@ body.panel-open .description-panel {
   margin-bottom: 0;
 }
 
-/* Botón de Instagram alineado al Design System */
-.panel-btn-instagram {
-  display: inline-flex;
+/* ==========================================================================
+   SECCIÓN DE APLICACIONES (Parte inferior del panel Sobre mí)
+   Grilla armoniosa con iconos compactos y alineados
+   ========================================================================== */
+.apps-section {
+  margin-top: auto;
+  padding-top: clamp(2.5rem, 4.5vh, 4.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.apps-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.9rem, 1vw, 16px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: #212121;
+  opacity: 0.85;
+  margin: 0 0 1.25rem 0 !important;
+  padding: 0;
+  text-align: left;
+  letter-spacing: normal;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  align-items: center;
+  row-gap: clamp(40px, 4.8vh, 56px);
+  column-gap: clamp(34px, 3.4vw, 54px);
+  width: fit-content;
+  max-width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  padding-bottom: 4px;
+}
+
+.app-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default; /* No clickeable */
+  outline: none;
+  user-select: none;
+}
+
+.app-icon-box {
+  width: clamp(56px, 3.8vw, 66px);
+  height: clamp(56px, 3.8vw, 66px);
+  border-radius: clamp(12px, 0.8vw, 15px);
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.25s ease;
+  background: #111;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  margin-top: 1.6rem;
-  padding: 0.65rem 1.45rem;
-  background-color: #212121;
+  box-sizing: border-box;
+  cursor: default;
+}
+
+.app-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.app-item:hover .app-icon-box {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+
+.app-name {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #212121;
+  background: rgba(255, 254, 246, 0.96);
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  z-index: 25;
+}
+
+/* Columna 1 (izquierda) — nombre alineado a la izquierda para no salirse por el margen */
+.app-item:nth-child(3n+1) .app-name {
+  left: 0;
+  transform: translateY(4px);
+}
+.app-item:nth-child(3n+1):hover .app-name {
+  transform: translateY(0);
+}
+
+/* Columna 2 (centro) */
+.app-item:nth-child(3n+2) .app-name {
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+.app-item:nth-child(3n+2):hover .app-name {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Columna 3 (derecha) */
+.app-item:nth-child(3n) .app-name {
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+.app-item:nth-child(3n):hover .app-name {
+  transform: translateX(-50%) translateY(0);
+}
+
+.app-item:hover .app-name {
+  opacity: 1;
+}
+
+/* Botón de Instagram alineado al nuevo diseño (plano y minimalista) */
+.panel-btn-instagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1.8rem;
+  padding: 0.95rem 1.4rem;
+  background-color: #242424;
   color: #FFFFFF;
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(0.72rem, 0.78vw, 12px);
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-size: clamp(0.85rem, 0.92vw, 14.5px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  text-transform: uppercase;
-  border-radius: 999px;
-  border: 1.5px solid #212121;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  text-transform: lowercase;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   transition: 
-    background-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
   cursor: pointer;
   user-select: none;
-  will-change: transform;
 }
 
 .panel-btn-instagram:hover {
-  background-color: transparent;
-  color: #212121;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+  background-color: #383838;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  box-shadow: none;
+  transform: none;
 }
 
 .panel-btn-instagram:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  background-color: #1a1a1a;
+  transform: none;
+  box-shadow: none;
+}
+
+.panel-btn-instagram .btn-ig-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .panel-btn-instagram .btn-ig-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  fill: currentColor;
-  transition: transform 0.3s ease;
-}
-
-.panel-btn-instagram .btn-arrow-icon {
-  width: 13px;
-  height: 13px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
   stroke: currentColor;
-  transition: transform 0.3s ease;
+  stroke-width: 1.8;
+  transition: opacity 0.2s ease;
 }
 
-.panel-btn-instagram:hover .btn-ig-icon {
-  transform: scale(1.12);
-}
-
-.panel-btn-instagram:hover .btn-arrow-icon {
-  transform: translate(2px, -2px);
+.panel-btn-instagram .btn-ig-text {
+  display: inline-block;
+  line-height: 1;
 }
 
 /* ==========================================================================

@@ -27,7 +27,8 @@
       <filter id="inkWiggle">
         <feTurbulence id="inkTurbulence" type="fractalNoise" baseFrequency="0.035 0.02" numOctaves="3" result="noise"
           seed="1" />
-        <feDisplacementMap id="inkDisplace" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+        <feDisplacementMap id="inkDisplace" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R"
+          yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
@@ -92,16 +93,7 @@
           </button>
         </li>
 
-        <!-- 4. Vibecode -->
-        <li class="category-wrapper" role="presentation">
-          <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-vibecode"
-            id="tab-vibecode" data-category="vibecode">
-            <span class="category-label">Vibecode</span>
-            <span class="category-hover-line" aria-hidden="true"></span>
-          </button>
-        </li>
-
-        <!-- 5. Logofolio -->
+        <!-- 4. Logofolio -->
         <li class="category-wrapper" role="presentation">
           <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-logofolio"
             id="tab-logofolio" data-category="logofolio">
@@ -110,7 +102,7 @@
           </button>
         </li>
 
-        <!-- 6. Etc -->
+        <!-- 5. Etc -->
         <li class="category-wrapper" role="presentation">
           <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-etc" id="tab-etc"
             data-category="etc">
@@ -147,17 +139,12 @@
         <div class="category-panel-placeholder" data-panel="multimediales"></div>
       </section>
 
-      <!-- 4. Vibecode -->
-      <section class="category-panel" id="panel-vibecode" role="tabpanel" aria-labelledby="tab-vibecode">
-        <div class="category-panel-placeholder" data-panel="vibecode"></div>
-      </section>
-
-      <!-- 5. Logofolio -->
+      <!-- 4. Logofolio -->
       <section class="category-panel" id="panel-logofolio" role="tabpanel" aria-labelledby="tab-logofolio">
         <div class="category-panel-placeholder" data-panel="logofolio"></div>
       </section>
 
-      <!-- 6. Etc -->
+      <!-- 5. Etc -->
       <section class="category-panel" id="panel-etc" role="tabpanel" aria-labelledby="tab-etc">
         <div class="category-panel-placeholder" data-panel="etc"></div>
       </section>
@@ -176,11 +163,60 @@
           <div class="panel-category-line" id="panelCategoryLine" aria-hidden="true"></div>
           <div class="panel-category-desc" id="panelCategoryDesc">
             <p>
-              Holaaa, me dicen Tabbi, tengo <span id="userAge">24</span> años y actualmente estudio Licenciatura en Diseño Multimedial en la Facultad de Artes UNLP.
+              Holaa, me dicen Tabbi, tengo <span id="userAge">24</span> años y actualmente estudio Licenciatura en
+              Diseño Multimedial en la Facultad de Artes UNLP.
             </p>
             <p>
-              Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí multimedial porque no puedo quedarme con una sola área, siento que siempre hay algo innovador para hacer.
+              Me considero una persona muy creativa y predispuesta para cualquier tipo de proyecto. Elegí Diseño
+              Multimedial porque me cuesta quedarme con una sola área del diseño y arte, siento que siempre hay algo
+              innovador para hacer.
             </p>
+            <p>
+              Me gustan mucho los videojuegos, la musica y el cine. No me encasillo en un solo genero, siento que todo
+              tiene algo bueno para ofrecer.
+            </p>
+            <p>
+              Por ese mismo motivo creo que Diseño Multimedial es la carrera perfecta para mí, y es un poco lo que
+              demuestro en este portfolio.
+            </p>
+            <div class="apps-section">
+              <p class="apps-title">Aplicaciones que realmente sé usar:</p>
+              <div class="apps-grid">
+                <!-- Fila 1 -->
+                <div class="app-item" data-app="Resolume Arena">
+                  <div class="app-icon-box">
+                    <img src="svg/image 2.svg" alt="Resolume Arena" class="app-icon" draggable="false">
+                  </div>
+                  <span class="app-name">Resolume Arena</span>
+                </div>
+                <div class="app-item" data-app="TouchDesigner">
+                  <div class="app-icon-box">
+                    <img src="svg/image 1.svg" alt="TouchDesigner" class="app-icon" draggable="false">
+                  </div>
+                  <span class="app-name">TouchDesigner</span>
+                </div>
+                <div class="app-item" data-app="Figma">
+                  <div class="app-icon-box">
+                    <img src="svg/image 3.svg" alt="Figma" class="app-icon" draggable="false">
+                  </div>
+                  <span class="app-name">Figma</span>
+                </div>
+
+                <!-- Fila 2 -->
+                <div class="app-item" data-app="Illustrator">
+                  <div class="app-icon-box">
+                    <img src="svg/image 4.svg" alt="Illustrator" class="app-icon" draggable="false">
+                  </div>
+                  <span class="app-name">Illustrator</span>
+                </div>
+                <div class="app-item" data-app="Antigravity">
+                  <div class="app-icon-box">
+                    <img src="svg/image 5.svg" alt="Antigravity" class="app-icon" draggable="false">
+                  </div>
+                  <span class="app-name">Antigravity</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
