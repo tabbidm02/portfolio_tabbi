@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200..400&display=swap" rel="stylesheet">
 
   <!-- Estilos principales con cache-busting -->
-  <link rel="stylesheet" href="css/style.css?v=2.1">
+  <link rel="stylesheet" href="css/style.css?v=2.3">
 </head>
 
 <body data-frame="1" data-category="sobre-mi">
@@ -76,20 +76,20 @@
           </button>
         </li>
 
-        <!-- 2. Flyers -->
-        <li class="category-wrapper" role="presentation">
-          <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-flyers" id="tab-flyers"
-            data-category="flyers">
-            <span class="category-label">Flyers</span>
-            <span class="category-hover-line" aria-hidden="true"></span>
-          </button>
-        </li>
-
-        <!-- 3. Multimediales -->
+        <!-- 2. Multimediales -->
         <li class="category-wrapper" role="presentation">
           <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-multimediales"
             id="tab-multimediales" data-category="multimediales">
             <span class="category-label">Multimediales</span>
+            <span class="category-hover-line" aria-hidden="true"></span>
+          </button>
+        </li>
+
+        <!-- 3. Flyers -->
+        <li class="category-wrapper" role="presentation">
+          <button class="category-item" role="tab" aria-selected="false" aria-controls="panel-flyers" id="tab-flyers"
+            data-category="flyers">
+            <span class="category-label">Flyers</span>
             <span class="category-hover-line" aria-hidden="true"></span>
           </button>
         </li>
@@ -124,7 +124,14 @@
         <div class="polaroids-stage" id="polaroidsStage"></div>
       </section>
 
-      <!-- 2. Flyers -->
+      <!-- 2. Multimediales -->
+      <section class="category-panel" id="panel-multimediales" role="tabpanel" aria-labelledby="tab-multimediales">
+        <div class="category-panel-placeholder" data-panel="multimediales">
+          <span class="in-progress-label">EN PROCESO</span>
+        </div>
+      </section>
+
+      <!-- 3. Flyers -->
       <section class="category-panel" id="panel-flyers" role="tabpanel" aria-labelledby="tab-flyers">
         <div class="flyers-scroll-container" id="flyersScrollContainer">
           <div class="flyers-columns-grid" id="flyersColumnsGrid">
@@ -135,19 +142,18 @@
         </div>
       </section>
 
-      <!-- 3. Multimediales -->
-      <section class="category-panel" id="panel-multimediales" role="tabpanel" aria-labelledby="tab-multimediales">
-        <div class="category-panel-placeholder" data-panel="multimediales"></div>
-      </section>
-
       <!-- 4. Logofolio -->
       <section class="category-panel" id="panel-logofolio" role="tabpanel" aria-labelledby="tab-logofolio">
-        <div class="category-panel-placeholder" data-panel="logofolio"></div>
+        <div class="category-panel-placeholder" data-panel="logofolio">
+          <span class="in-progress-label">EN PROCESO</span>
+        </div>
       </section>
 
       <!-- 5. Contacto -->
       <section class="category-panel" id="panel-contacto" role="tabpanel" aria-labelledby="tab-contacto">
-        <div class="category-panel-placeholder" data-panel="contacto"></div>
+        <div class="category-panel-placeholder" data-panel="contacto">
+          <span class="in-progress-label">EN PROCESO</span>
+        </div>
       </section>
     </main>
 
@@ -237,7 +243,7 @@
   </div>
 
   <!-- Script modular con cache-busting -->
-  <script src="js/main.js?v=2.1"></script>
+  <script src="js/main.js?v=2.3"></script>
 </body>
 
 </html>

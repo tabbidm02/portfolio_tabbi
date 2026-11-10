@@ -748,13 +748,13 @@
       title: 'Agustin Tabbita',
       desc: getTextoSobreMi
     },
-    'flyers': {
-      title: TITULO_FLYERS,
-      desc: ''
-    },
     'multimediales': {
       title: 'Multimediales',
       desc: 'Instalaciones interactivas, motion graphics y proyectos audiovisuales que exploran el espacio, el tiempo y la relación activa con el espectador.'
+    },
+    'flyers': {
+      title: TITULO_FLYERS,
+      desc: ''
     },
     'logofolio': {
       title: 'Logofolio',
@@ -1920,24 +1920,24 @@
       const isMobile = window.innerWidth <= 768;
       const stageRect = this.stage.getBoundingClientRect();
       const stageW = stageRect.width || this.stage.offsetWidth || (window.innerWidth * (isMobile ? 0.92 : 0.55));
-      let stageH = stageRect.height || this.stage.offsetHeight || window.innerHeight;
+      let stageH = stageRect.height || this.stage.offsetHeight || (window.innerHeight * (isMobile ? 0.84 : 1.0));
 
-      // En mobile (<= 768px): el bottom sheet cubre el 42dvh inferior; ajustamos el alto efectivo de la mesa
+      // En mobile (<= 768px): el alto de tirada aprovecha el espacio disponible del stage sobre la mesa
       if (isMobile) {
-        stageH = Math.max(220, window.innerHeight * 0.42);
+        stageH = Math.max(380, window.innerHeight * 0.54);
       }
 
       const sample = this.items[0];
       const cardW = isMobile
-        ? Math.min(180, Math.max(130, stageW * 0.38))
+        ? Math.min(255, Math.max(205, window.innerWidth * 0.60))
         : ((sample && sample.offsetWidth > 40)
             ? sample.offsetWidth
             : Math.min(350, Math.max(245, stageW * 0.22)));
       const cardH = cardW * 1.3913; // proporción 989:1376 de los SVGs
 
       // Margen de seguridad estricto para no tocar los bordes de la pantalla
-      const padX = 18;
-      const padY = 22;
+      const padX = isMobile ? 12 : 18;
+      const padY = isMobile ? 14 : 22;
       const minX = padX;
       const maxX = Math.max(minX, stageW - cardW - padX);
       const minY = padY;
@@ -1945,8 +1945,8 @@
 
       const cx = (minX + maxX) / 2;
       const cy = (minY + maxY) / 2;
-      const spreadX = (maxX - minX) * 0.40;
-      const spreadY = (maxY - minY) * 0.38;
+      const spreadX = (maxX - minX) * (isMobile ? 0.36 : 0.40);
+      const spreadY = (maxY - minY) * (isMobile ? 0.36 : 0.38);
 
       // 10 posiciones armónicas y variadas para que aterricen orgánicamente sobre la mesa
       const baseConfig = [
@@ -1972,7 +1972,7 @@
 
         const x = Math.max(minX, Math.min(maxX, Math.round(rawX)));
         const y = Math.max(minY, Math.min(maxY, Math.round(rawY)));
-        const rot = c.rot;
+        const rot = isMobile ? +(c.rot * 0.65).toFixed(1) : c.rot;
 
         layouts.push({ x, y, rot, minX, maxX, minY, maxY });
       }
@@ -2158,10 +2158,10 @@
         const stageRect = this.stage.getBoundingClientRect();
         const cardW = el.offsetWidth || 260;
         const cardH = el.offsetHeight || (cardW * 1.3913);
-        const minX = 12;
-        const maxX = Math.max(minX, stageRect.width - cardW - 12);
-        const minY = 16;
-        const maxY = Math.max(minY, stageRect.height - cardH - 16);
+        const minX = 8;
+        const maxX = Math.max(minX, stageRect.width - cardW - 8);
+        const minY = 8;
+        const maxY = Math.max(minY, stageRect.height - cardH - 8);
 
         const newX = Math.max(minX, Math.min(maxX, Math.round(startEX + dx)));
         const newY = Math.max(minY, Math.min(maxY, Math.round(startEY + dy)));
