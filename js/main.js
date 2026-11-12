@@ -164,6 +164,21 @@
       titulo: "Bad Bunny - Dtmf Tour",
       descripcion: "Flyer que hice con fotos propias tomadas en el increíble recital de Bad Bunny en el Monumental."
     },
+    {
+      archivos: ["Francisco de Goya.jpg"],
+      titulo: "Vuelo de Brujas",
+      descripcion: "Flyer inspirado en la obra 'Vuelo de brujas' de Francisco de Goya."
+    },
+    {
+      archivos: ["CALENDARIO 2026.jpg"],
+      titulo: "Calendario 2026",
+      descripcion: "Calendario hecho para regalar, con cariño y dibujos propios."
+    },
+    {
+      archivos: ["misdientes.jpg"],
+      titulo: "Placa dental",
+      descripcion: "Si, es una placa dental mia, nose a que vino, pero quedó cool."
+    },
     // --- SERIE AGRUPADA 3: Exploración Visual (Colección rotatoria de 3 piezas) ---
     {
       archivos: [
@@ -343,7 +358,7 @@
       this.FREQ_X            = 0.040;
       this.FREQ_Y            = 0.018;
       // Intensidad del displacement (cuánto "mueve" la tinta)
-      this.SCALE             = 7;
+      this.SCALE             = 4.5;
       // Cada cuántos ms salta el seed (varía el patrón fractal)
       this.INTERVALO_SEED    = 85;
       // ──────────────────────────────────────────────────────────────────────
@@ -1027,6 +1042,10 @@
     }
 
     updateDescContent(categoryName) {
+      if (this.panel) {
+        this.panel.setAttribute('data-panel-category', categoryName);
+      }
+
       if (categoryName === 'flyers') {
         this.showFlyersIntro();
         return;
@@ -1642,6 +1661,7 @@
           prevCard.style.removeProperty('--flyer-selected-offset-x');
           prevCard.style.removeProperty('--flyer-selected-offset-y');
           prevCard.style.removeProperty('--mobile-flyer-scale');
+          prevCard.style.removeProperty('--mobile-flyer-scale-inv');
         }, 450);
       }
 
@@ -1700,6 +1720,7 @@
           : Math.max(1.85, Math.min(dynamicScale, 2.05));
 
         cardEl.style.setProperty('--mobile-flyer-scale', mobileScale.toFixed(2));
+        cardEl.style.setProperty('--mobile-flyer-scale-inv', (1 / mobileScale).toFixed(3));
       } else {
         // En desktop: centrado vertical exacto en la mitad de la pantalla (50vh)
         // Evita que los primeros flyers se recorten arriba por topar en scrollTop = 0
@@ -1759,6 +1780,7 @@
           previouslySelectedCard.style.removeProperty('--flyer-selected-offset-x');
           previouslySelectedCard.style.removeProperty('--flyer-selected-offset-y');
           previouslySelectedCard.style.removeProperty('--mobile-flyer-scale');
+          previouslySelectedCard.style.removeProperty('--mobile-flyer-scale-inv');
         }, 540);
       }
 

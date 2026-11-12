@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200..400&display=swap" rel="stylesheet">
 
   <!-- Estilos principales con cache-busting -->
-  <link rel="stylesheet" href="css/style.css?v=2.3">
+  <link rel="stylesheet" href="css/style.css?v=2.4">
 </head>
 
 <body data-frame="1" data-category="sobre-mi">
@@ -28,7 +28,7 @@
       <filter id="inkWiggle">
         <feTurbulence id="inkTurbulence" type="fractalNoise" baseFrequency="0.035 0.02" numOctaves="3" result="noise"
           seed="1" />
-        <feDisplacementMap id="inkDisplace" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R"
+        <feDisplacementMap id="inkDisplace" in="SourceGraphic" in2="noise" scale="4.5" xChannelSelector="R"
           yChannelSelector="G" />
       </filter>
     </defs>
@@ -158,10 +158,10 @@
     </main>
 
     <!-- FRAME 2: Panel Lateral Derecho de Descripción (top: 0, right: 0, 100vh, ~20vw) -->
-    <aside class="category-desc-panel" id="categoryDescPanel" aria-label="Descripción de categoría">
-      <!-- Fondo claro con retícula técnica de Group 20.svg -->
+    <aside class="category-desc-panel" id="categoryDescPanel" data-panel-category="sobre-mi" aria-label="Descripción de categoría">
+      <!-- Fondo claro con formato fichero/archivero de rectangulo nuevo.svg -->
       <div class="desc-panel-bg" aria-hidden="true">
-        <img src="svg/Group 20.svg" alt="" class="desc-panel-grid" draggable="false">
+        <img src="svg/rectangulo nuevo.svg" alt="" class="desc-panel-grid" draggable="false">
       </div>
       <!-- Barra / Tirador táctil interactiva para mobile -->
       <div class="panel-drag-handle" id="panelDragHandle" role="button" tabindex="0" aria-label="Desplegar o replegar información">
@@ -243,7 +243,7 @@
   </div>
 
   <!-- Script modular con cache-busting -->
-  <script src="js/main.js?v=2.3"></script>
+  <script src="js/main.js?v=2.4"></script>
 </body>
 
 </html>

@@ -15,14 +15,14 @@
 
   /* Proporciones Desktop Frame 1 */
   --margin-left-axis-f1: 4.58vw; /* ~88px en FHD */
-  --top-title-f1: 19vh;
-  --top-subtitle-f1: 40.4vh;
-  --top-author-f1: 57.2vh;
+  --top-title-f1: 16.5vh;
+  --top-subtitle-f1: 43vh;
+  --top-author-f1: 61.5vh;
 
-  --width-title-f1: 44.5vw;
-  --max-width-title-f1: 855px;
-  --width-subtitle: 26vw;
-  --max-width-subtitle: 500px;
+  --width-title-f1: 56vw;
+  --max-width-title-f1: 1140px;
+  --width-subtitle: 33vw;
+  --max-width-subtitle: 670px;
 
   /* Proporciones Desktop Frame 2 (left: 2.19% ~42px, top: 3.43% ~37px) */
   --margin-left-axis-f2: 1.2vw;  /* Más pegado a la izquierda */
@@ -40,16 +40,19 @@
   --min-width-logo: 44px;
 
   /* Tipografía */
-  --font-size-author: clamp(1.2rem, 2.08vw, 40px);
+  --font-size-author: clamp(1.25rem, 2.3vw, 44px);
   --font-size-cat-active: clamp(1.2rem, 1.5vw, 28px);
   --font-size-cat-inactive: clamp(0.9rem, 1.05vw, 20px);
   --line-active-width: 52px;     /* 2.71vw en Figma */
 
   /* Panel Lateral Derecho (Descripción) */
   --panel-delay: 0.6s;           /* Delay configurable antes de que aparezca el panel */
-  --panel-width: 20vw;           /* Ancho estándar para categorías generales (~384px en FHD) */
+  --panel-tab-protrusion: calc(100vh * 28 / 1079); /* Saliente de 28px en FHD según rectangulo nuevo.svg (solo Multimediales) */
+  --panel-tab-height: calc(100vh * 143 / 1079);    /* Alto de 143px de la pestaña en FHD */
+  --panel-body-pad-left: clamp(1.35rem, 1.7vw, 2rem);
+  --panel-width: 20vw;           /* Ancho estándar del panel */
   --panel-max-width: 420px;
-  --panel-width-sobre-mi: clamp(420px, 30vw, 620px); /* Ancho exclusivo y amplio para 'Sobre mí' */
+  --panel-width-sobre-mi: clamp(420px, 30vw, 620px); /* Ancho exclusivo para 'Sobre mí' */
   --panel-max-width-sobre-mi: 620px;
   --panel-color: #FFFEF6;        /* Crema claro del rectángulo */
 
@@ -1042,12 +1045,22 @@ body:not(.panel-open) .hero-logo-dark {
   pointer-events: none;
   overflow: hidden;
   box-shadow: -10px 0 35px rgba(0, 0, 0, 0.2);
+  filter: none;
   transition: 
     transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--panel-delay, 0.6s),
     width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
   cursor: default;
+}
+
+/* Estética Fichero/Archivero (rectangulo nuevo.svg) EXCLUSIVA de la categoría Multimediales */
+.category-desc-panel[data-panel-category="multimediales"] {
+  --panel-width: calc(20vw + var(--panel-tab-protrusion));
+  --panel-max-width: calc(420px + var(--panel-tab-protrusion));
+  background-color: transparent;
+  box-shadow: none;
+  filter: drop-shadow(-10px 0 28px rgba(0, 0, 0, 0.22));
 }
 
 .panel-drag-handle {
@@ -1068,9 +1081,10 @@ body.panel-open .description-panel {
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
 }
 
-/* Fondo con el SVG claro (Group 20.svg) */
+/* Fondo con el SVG claro estilo fichero/archivero (rectangulo nuevo.svg) - visible solo en Multimediales */
 .desc-panel-bg,
 .description-panel-bg {
+  display: none;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1080,18 +1094,33 @@ body.panel-open .description-panel {
   z-index: 1;
 }
 
+.category-desc-panel[data-panel-category="multimediales"] .desc-panel-bg {
+  display: block;
+}
+
+.desc-panel-bg::after,
+.description-panel-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--panel-tab-protrusion, 28px);
+  right: 0;
+  background-color: var(--panel-color, #FFFEF6);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .desc-panel-grid,
 .description-panel-svg {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   height: 100%;
   width: auto;
-  min-width: 100%;
-  object-fit: cover;
-  object-position: right top;
   pointer-events: none;
   opacity: 1;
+  z-index: 1;
 }
 
 /* Contenedor de contenido y texto */
@@ -1145,6 +1174,10 @@ body.panel-open .description-panel {
     transform 0.4s var(--ease-out-expo);
 }
 
+.category-desc-panel[data-panel-category="multimediales"] .panel-text-container {
+  padding: clamp(2.1rem, 3.6vh, 2.8rem) clamp(2rem, 2.4vw, 3rem) clamp(5rem, 12vh, 8rem) calc(var(--panel-tab-protrusion, 28px) + var(--panel-body-pad-left, 1.6rem));
+}
+
 .panel-text-container.is-changing,
 .description-text-inner.is-changing {
   opacity: 0;
@@ -1174,6 +1207,7 @@ body.panel-open .description-panel {
   color: #212121;
   letter-spacing: -0.01em;
   margin-bottom: 1.2rem;
+  margin-left: 0;
 }
 
 .panel-category-line,
@@ -1183,7 +1217,19 @@ body.panel-open .description-panel {
   background-color: #212121;
   border-radius: 999px;
   margin-bottom: 1.8rem;
+  margin-left: 0;
   opacity: 0.75;
+}
+
+/* En Multimediales: tanto el título como la pequeña línea se desplazan hacia la izquierda para ocupar la pestaña saliente del fichero */
+.category-desc-panel[data-panel-category="multimediales"] .panel-category-title {
+  margin-left: calc(-1 * var(--panel-body-pad-left, 1.6rem) - (var(--panel-tab-protrusion, 28px) * 0.52));
+  margin-bottom: 0.85rem;
+}
+
+.category-desc-panel[data-panel-category="multimediales"] .panel-category-line {
+  margin-left: calc(-1 * var(--panel-body-pad-left, 1.6rem) - (var(--panel-tab-protrusion, 28px) * 0.52));
+  margin-bottom: clamp(2.2rem, 4.2vh, 3rem);
 }
 
 .panel-category-desc,
@@ -1582,6 +1628,8 @@ body.panel-open .description-panel {
     right: 0 !important;
     width: 100vw !important;
     max-width: 100vw !important;
+    background-color: var(--panel-color, #FFFEF6) !important;
+    filter: none !important;
     border-radius: 0 !important; /* Totalmente recto, sin esquinas redondeadas */
     border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45) !important;
@@ -1595,6 +1643,11 @@ body.panel-open .description-panel {
     height: 42dvh !important;
     max-height: 42dvh !important;
     box-sizing: border-box !important;
+  }
+
+  .desc-panel-bg,
+  .description-panel-bg {
+    display: none !important;
   }
 
   /* Tirador / Handle interactivo para arrastre (drag/swipe) y tap */
@@ -1760,10 +1813,12 @@ body.panel-open .description-panel {
   .panel-category-title {
     font-size: clamp(1.25rem, 4.4vw, 22px) !important;
     margin-bottom: 0.5rem !important;
+    margin-left: 0 !important;
   }
 
   .panel-category-line {
     margin-bottom: 0.7rem !important;
+    margin-left: 0 !important;
   }
 
   .panel-category-desc {
@@ -1859,6 +1914,35 @@ body.panel-open .description-panel {
   /* Cuando el panel se expande manualmente por swipe/tap, se sitúa sobre el flyer para poder leer */
   body[data-category="flyers"].flyer-selected:not(.panel-mobile-collapsed) .category-desc-panel {
     z-index: 120 !important;
+  }
+
+  /* Indicador numérico de variaciones en mobile (mucho más compacto y discreto) */
+  .flyer-series-badge {
+    top: 5px !important;
+    right: 5px !important;
+    font-size: 7.5px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.04em !important;
+    padding: 1.5px 5px !important;
+    line-height: 1.2 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.18) !important;
+    opacity: 0.8 !important;
+    transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Cuando el flyer está seleccionado y ampliado (~2x), contrarrestamos la escala
+     para que el badge no se vuelva gigante ni tape la tipografía */
+  .flyer-card.is-selected .flyer-series-badge {
+    transform: scale(var(--mobile-flyer-scale-inv, 0.48)) !important;
+    transform-origin: top right !important;
+    top: 6px !important;
+    right: 6px !important;
+    opacity: 0.85 !important;
   }
 
   /* --------------------------------------------------------------------------
